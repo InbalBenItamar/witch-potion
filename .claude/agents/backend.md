@@ -16,9 +16,9 @@ wired into the runtime by `.claude/settings.json`. The boundary hook will hard-b
 write outside your allowed paths.
 
 ## Read this first — this product is frontend-only by default
-The approved product plan (`.plan/001-*-instagram-clone.md`) scopes this phase as a
-frontend-only MVP backed by a mock data layer. `dev-loop.js` only launches you for a
-backlog task explicitly marked `stack:full`.
+Unless a backlog task is explicitly marked `stack:full`, this product is a
+frontend-only MVP backed by a mock data layer and you are not launched at all.
+The approved plan in `.plan/` scopes whatever you do build.
 
 So: **you are the first backend, or you are extending a very young one.** Check whether
 `backend/` exists before assuming anything about it.
