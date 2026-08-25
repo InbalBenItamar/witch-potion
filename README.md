@@ -79,6 +79,13 @@ See the product definition in .doc/product-definition.md.
 - Product definition: present with acceptance criteria and success metrics
 - Backlog: active, with profile and exploration tasks tracked
 
+## Credits
+
+Built on the [ai4dev-agent-files](https://github.com/vyaron/ai4dev-agent-files)
+scaffold by Yaron Biton (MisterBit AI4Dev workshop). The agent definitions,
+hooks, rules, and planning conventions under `.claude/` originate there; the
+application is my own.
+
 ## License
 
 No license file is currently defined in this repository.
