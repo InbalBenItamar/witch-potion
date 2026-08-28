@@ -5,22 +5,36 @@ Format:
 - `- [ ] <title> | figma:<url>`   optional design reference
 - `- [ ] <title> | stack:full`    opts the task into the backend stage
 
-Tasks are **frontend-only by default** — `dev-loop.js` runs frontend + qa and skips the
+Tasks are **frontend-only by default** — the loop runs frontend + qa and skips the
 backend agent unless a task is marked `stack:full` or a `backend/` directory exists.
-See `.doc/product-definition.md` for the acceptance criteria QA checks against.
+See `.doc/product-definition.md` for the acceptance criteria QA checks against, and
+`.doc/ingredient.md` for the approved ingredient list every potion is built from.
 
 Current queue:
-- [ ] profile page | figma:https://www.figma.com/design/n16ZPecWb35xpvNomre6zu/Instagram-UI-Screens--Community-?node-id=0-2662&m=dev
+- [ ] brew a potion from a trouble | stack:full
 
-- [ ] post detail view with comments
-- [ ] explore / search users by username
-- [ ] followers and following list on profile
+  Version one end to end: text box and chips, `POST /api/potion`, both generators
+  behind one interface, the filter, and the potion on screen. Acceptance criteria
+  AC1 to AC15.
 
+- [ ] prepare-ahead list
 
+  Turn a potion into a list a child can gather before they start playing. Groups
+  ingredients by where they are found, and marks what an adult needs to fetch.
 
+- [ ] evaluate and tune the prompt
+
+  Run a fixed set of troubles through two prompt versions and compare the potions.
+  Needs a scoring script beside the prompt. Depends on the prompt already being a
+  versioned file, which version one establishes.
+
+- [ ] speak the trouble instead of typing it
+
+  Web Speech API in the browser, no API cost, no server round trip. Must degrade to
+  the text box on Safari and Firefox rather than hiding the feature.
+
+- [ ] animate the witch
+
+  She reacts while the potion is brewing. Design work, no architectural change.
 
 ## DONE
-- [x] Pixel perfect the visual design | figma:https://www.figma.com/design/n16ZPecWb35xpvNomre6zu/Instagram-UI-Screens--Community-?node-id=0-1646&m=dev
-- [x] feed, profile, notifications and auth views (see .plan/001-2026-07-01-instagram-clone.md)
-
-
