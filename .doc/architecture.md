@@ -20,7 +20,7 @@
 | Browser app | `frontend/` | Text box, chips, Brew button, potion display. Holds no key and no ingredient logic |
 | Brew route | `backend/` | `POST /api/potion`. Validates the trouble, picks a generator, runs the filter, returns the potion |
 | Generator interface | `backend/` | One shape both generators satisfy: `trouble` in, candidate `potion` out |
-| Offline generator | `backend/` | Matches the trouble against feeling tags, picks ingredients and assembles a potion. Takes an injected random number generator so tests can seed it |
+| Offline generator | `backend/` | Matches the trouble against feeling tags, picks one to three matched ingredients, fills the rest from the neutral pool, and assembles a potion. Takes an injected random number generator so tests can seed it |
 | Witch generator | `backend/` | Sends the prompt and the approved ingredient list to Claude, parses the reply |
 | Filter | `backend/` | Removes unapproved ingredients, cascades removals into the steps, enforces the floor of four, rejects unapproved step verbs, and rejects text over the readability limits |
 | Ingredient data | `backend/` | The machine-readable form of `.doc/ingredient.md`, asserted to match it by a test |
@@ -55,6 +55,20 @@ The filter runs on **both** paths, not just the Claude one. The offline generato
 never produce an unapproved ingredient, so the check is redundant there by design —
 which is exactly why it belongs there. A single filter with no bypass is easier to prove
 correct than two paths with different guarantees.
+
+## How ingredients are chosen
+
+Both generators follow the same rule, and it is not "pick ingredients matching the
+trouble". Eleven of the seventeen feeling tags have fewer than five ingredients, and
+`jealous` and `stuck` have exactly one — so a matched-only potion is impossible for most
+troubles.
+
+Instead: **one to three ingredients tagged for the trouble's feeling, and the rest drawn
+from the neutral pool** in `.doc/ingredient.md`, to a total of five to seven. At least one
+matched ingredient is required; a potion with none is not about the trouble at all.
+
+Selection is a single pass over the 42 ingredients per brew — O(n) in the list size, which
+is a constant here. Nothing needs indexing.
 
 ## Auth and Org Boundaries
 - There is no user authentication. No accounts, no sessions, no personal data stored.

@@ -83,6 +83,46 @@ Each ingredient answers one or more feelings. The generators match a trouble to 
 | a scrap of cotton fabric | scared, missing-someone | A corner of something familiar |
 | a button | worried, left-out | Kept spare, just in case. Somebody thought ahead |
 
+## The neutral pool
+
+Most feelings have only three or four ingredients tagged for them, and two — `jealous`
+and `stuck` — have exactly one. So a potion is **not** built only from ingredients
+matching the trouble. It takes one to three matched ingredients and fills the rest from
+this neutral pool, which may appear in any potion regardless of the trouble.
+
+This is also how a recipe actually reads: a couple of things chosen *for your feeling*,
+and the rest is what makes it a potion.
+
+- half a cup of water *(always present)*
+- a spoonful of flour
+- three pinches of salt
+- a spoonful of sugar
+- a spoonful of dry rice
+- a drop of food colouring
+- a shake of edible glitter
+- a dab of washable poster paint
+- a length of ribbon
+- a piece of string
+- a smooth pebble
+- a scrap of tissue paper
+- a pom-pom
+
+## Starter kit
+
+The set to tick if you only tick one set. Sixteen ingredients: eleven that between them
+cover **all seventeen feeling tags**, plus five neutrals so the potion has body and
+sparkle. With these in the house, the witch can brew for any trouble a child types.
+
+Kitchen: flour · sugar · salt · lemon juice · baking soda · cocoa powder · dry rice ·
+a dried pasta star · a sunflower seed · a breadcrumb · water
+
+Craft drawer: edible glitter · food colouring · a length of ribbon · a piece of string ·
+a stick of chalk
+
+Nine of the sixteen are ordinary kitchen staples, which is deliberate — a family should
+be able to start today rather than after a shopping trip. The lemon juice and baking soda
+are the pair that fizz.
+
 ## Approved step verbs
 
 Steps may only use these. No heat, no cutting, no tasting.

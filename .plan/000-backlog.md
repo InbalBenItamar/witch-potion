@@ -17,10 +17,28 @@ Current queue:
   behind one interface, the filter, and the potion on screen. Acceptance criteria
   AC1 to AC15.
 
-- [ ] prepare-ahead list
+- [ ] prepare-ahead list | stack:full
 
-  Turn a potion into a list a child can gather before they start playing. Groups
-  ingredients by where they are found, and marks what an adult needs to fetch.
+  Let an adult tick which approved ingredients they actually have, before play
+  starts. The witch then brews only from what is ticked, so a potion never asks
+  for something that is not in the house. Grouped by where each one is found —
+  kitchen, garden, craft drawer.
+
+  The ticked set narrows the same allowlist the filter already applies, rather
+  than adding a parallel mechanism. It must survive from the checklist to the
+  brew, so this is the task that introduces state — version one deliberately
+  stores nothing. Decide where it lives before building.
+
+  Offer the starter kit from `.doc/ingredient.md` as a one-tap preset — sixteen
+  ingredients that between them cover all seventeen feeling tags, so ticking it
+  guarantees the witch can brew for anything. A flat minimum of ten ticks is the
+  floor beneath it, but ten arbitrary ticks do not guarantee coverage: check that
+  what is ticked can still produce a potion for every feeling, and say which
+  feelings are unreachable if it cannot.
+
+  Never quietly fall back to the full list when the ticked set is too thin. That
+  would break the promise the checklist makes — that a potion only asks for what
+  is in the house.
 
 - [ ] evaluate and tune the prompt
 
