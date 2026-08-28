@@ -52,11 +52,15 @@ the excuse. The afternoon is the product.
 	- A potion: a name, five to seven ingredients, ordered steps, a closing line, and the
 	  never-drink-it notice.
 	- Brew again, with a different potion for the same trouble.
+	- A visible witch, as an emoji placeholder. She is who the child is talking to, so
+	  the screen must read as hers even before she is drawn properly.
 	- Responsive layout down to a 375-pixel-wide screen.
 - Out of scope (version one):
 	- Saving anything. No accounts, no history, no shelf of past potions.
 	- A prepare-ahead shopping list.
-	- Voice input instead of typing.
+	- Voice input instead of typing, and the witch reading potions aloud.
+	- Sound of any kind. Version one is silent.
+	- A drawn witch. Version one uses an emoji placeholder; the SVG comes next.
 	- An animated witch.
 	- Public deployment and anything about who pays for API calls.
 	- Any real-world moderation of what a child types beyond the empty-input check.
