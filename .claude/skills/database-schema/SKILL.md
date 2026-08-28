@@ -5,9 +5,10 @@ description: Change or bootstrap the database schema. Use when adding or alterin
 
 # Database Schema
 
-> This product is frontend-only with a mock data layer until a backlog task is
-> explicitly marked `stack:full`. There is no database yet — apply this skill
-> only when a task actually introduces or changes one.
+> This product stores nothing. A potion is generated per request and discarded;
+> there is no database and version one does not need one. Apply this skill only
+> when a backlog task explicitly introduces persistence — currently only the
+> prepare-ahead list, which has to remember a ticked ingredient set.
 
 ## Source of truth
 `schema.sql` is a standalone bootstrap script for a full local setup. It creates

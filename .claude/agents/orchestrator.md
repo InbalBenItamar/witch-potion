@@ -53,9 +53,9 @@ an optional Figma URL, the existing plans, and `.doc/product-definition.md`.
 Plan rules:
 - `Status:` starts as `draft`. The terminal approval gate flips it to `active`.
 - Repository-relative paths only.
-- Respect the task's scope: for a frontend-only task, do not plan server work,
-  a database, or a `backend/` tree — the product is frontend-only with a mock
-  data layer until a task explicitly opts in.
+- Respect the task's scope: for a frontend-only task, do not plan server work or a
+  `backend/` tree. Never plan a database, a cache, or any persistence unless the
+  backlog task asks for it — a potion is generated per request and nothing is stored.
 - `Open Questions` must contain real questions, each with a recommended answer.
 
 ## Job B — Create Linear tickets

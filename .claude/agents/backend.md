@@ -16,9 +16,12 @@ wired into the runtime by `.claude/settings.json`. The boundary hook will hard-b
 write outside your allowed paths.
 
 ## Read this first — this product is frontend-only by default
-Unless a backlog task is explicitly marked `stack:full`, this product is a
-frontend-only MVP backed by a mock data layer and you are not launched at all.
-The approved plan in `.plan/` scopes whatever you do build.
+Unless a backlog task is explicitly marked `stack:full`, the task is frontend-only and
+you are not launched at all. The approved plan in `.plan/` scopes whatever you do build.
+
+Note that the `offline generator` is not a mock. It is real code doing real work —
+matching a trouble to feeling tags and assembling a potion — that happens not to call
+Claude. Never replace it with fixtures or stubs.
 
 So: **you are the first backend, or you are extending a very young one.** Check whether
 `backend/` exists before assuming anything about it.
