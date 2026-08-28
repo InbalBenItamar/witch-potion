@@ -24,8 +24,11 @@
 - `.plan/` — `000-backlog.md` is the task queue; `NNN-YYYY-MM-DD-*.md` are the plans.
 - `.orchestrate/` — everything the dev loop generates (plan mirror, tickets, agent
   reports, QA report, API contract, cost traces). Never create a `docs/` directory.
-- `frontend/` — the Next.js app. `backend/` does not exist yet and is only created by a
-  task explicitly marked `stack:full`.
+- `frontend/` — the React + Vite app. `backend/` — the Node + Express service that holds
+  the API key and serves potions. Neither exists yet; both are created by the first task,
+  which is marked `stack:full`.
+- `.doc/ingredient.md` — the closed list of approved ingredients. Nothing outside it may
+  ever appear in a potion served to a child.
 
 ## Rules — always in context
 @.claude/rules/code-style.md

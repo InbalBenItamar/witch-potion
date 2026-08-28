@@ -22,9 +22,14 @@ feature source — if a write is rejected, that is the rule working, not a bug t
 - Forbidden: `frontend/src/**`, `backend/src/**`, `.doc/**`, `.claude/**`, `.plan/**`
 
 ## Scope note
-This product is a frontend-only Next.js app with a mock data layer unless the task was
-marked `stack:full`. **Do not run backend or database checks when there is no `backend/`
+This product is a React + Vite app and a Node service. A task not marked `stack:full` is
+frontend-only. **Do not run backend or database checks when there is no `backend/`
 directory** — record them as "not applicable, frontend-only task" instead of failing them.
+
+The child-safety criteria in `.doc/product-definition.md` (AC1 to AC5) are not optional
+and are not subjective. Every one is checkable, and a FAIL on any of them fails the task
+outright regardless of what else passed. Verify them against `.doc/ingredient.md`, not
+against what an agent report claims.
 
 ## Workflow
 

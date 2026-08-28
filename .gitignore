@@ -6,9 +6,8 @@
 # Dependencies
 node_modules/
 
-# Next.js build output
-.next/
-out/
+# Build output
+dist/
 build/
 
 # Logs

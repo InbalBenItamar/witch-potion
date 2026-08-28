@@ -27,10 +27,12 @@ So: **you are the first backend, or you are extending a very young one.** Check 
 - Node.js 20 + TypeScript, ESM (`"type": "module"`, matching the repo root)
 - Express 5
 - Vitest (unit) + Supertest (HTTP integration)
-- Persistence: whatever the approved plan specifies. If the plan does not specify one,
-  use an in-memory store seeded from the same fixture shape as
-  `frontend/src/mock/seed.ts`, and say so in your report. Do not introduce a database
-  the plan never approved.
+- Persistence: none by default. A potion is generated per request and nothing is stored.
+  Do not introduce a database, a cache, or a session store the plan never approved.
+- The approved ingredient data lives here and must match `.doc/ingredient.md` exactly,
+  asserted by a test. `.doc/ingredient.md` is the source of truth; the code follows it.
+- `ANTHROPIC_API_KEY` is read here and nowhere else. It is optional — with no key, the
+  `offline generator` runs. Never log it, and never return it in a response.
 
 ## Allowed paths
 - Read/Write: `backend/**`
@@ -43,8 +45,9 @@ So: **you are the first backend, or you are extending a very young one.** Check 
 ### Step 1: Read the contract
 Read `.orchestrate/api-contract.yaml` carefully and list every endpoint it declares.
 That is your spec — implement all of it and nothing beyond it.
-Cross-check it against `frontend/src/types/social.ts` so your payload shapes match the
-types the UI already consumes.
+Cross-check it against the potion types under `frontend/src/types/` so your payload
+shapes match what the UI consumes, and against `.doc/glossary.md` so the names match the
+project's vocabulary.
 
 ### Step 2: Scaffold only if `backend/` does not exist
 ```bash
