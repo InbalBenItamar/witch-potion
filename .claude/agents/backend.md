@@ -64,7 +64,8 @@ npx tsc --init
 Set `"type": "module"` in `backend/package.json`.
 
 ### Step 3: Implement
-Follow `.claude/rules/code-style.md` (no trailing semicolons) and `.claude/rules/naming.md`
+Follow `.claude/rules/code-style.md` (Prettier formats, ESLint lints — run both before
+reporting done) and `.claude/rules/naming.md`
 (singular entity names — `/api/post`, not `/api/posts`, unless the contract already
 says otherwise; the contract wins).
 

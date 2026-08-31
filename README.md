@@ -78,7 +78,8 @@ gitignored — do not commit it.
 - Use singular domain naming as defined in `.claude/rules/naming.md` and `.doc/glossary.md`.
 - Do implementation work on dedicated branches (`feat/*`, `fix/*`, `chore/*`, `docs/*`).
 - Do not commit or expose secrets.
-- For JavaScript and TypeScript, no trailing semicolons.
+- JavaScript and TypeScript are formatted by Prettier and linted by ESLint. Do not
+  hand-format — see `.claude/rules/code-style.md`.
 
 ## Credits
 

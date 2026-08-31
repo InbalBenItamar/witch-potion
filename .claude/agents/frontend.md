@@ -69,9 +69,10 @@ destroy it. Check whether `frontend/package.json` exists before assuming either 
 - The ticket description and the Figma frame, if the task has either
 
 ### Step 2: Implement
-Match the surrounding code: **no trailing semicolons** (`.claude/rules/code-style.md`),
-singular entity names (`.claude/rules/naming.md`), Tailwind utilities only, `sonner` for
-toasts, `lucide-react` for icons.
+Match the surrounding code: **Prettier owns formatting, ESLint owns correctness**
+(`.claude/rules/code-style.md`) — run both before reporting done. Singular entity names
+(`.claude/rules/naming.md`), Tailwind utilities only, `sonner` for toasts, `lucide-react`
+for icons.
 
 Write for a seven-year-old. Short sentences, plain words, one clear action per screen.
 The Brew button says Brew, not Submit or Generate.
