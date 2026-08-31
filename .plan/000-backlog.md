@@ -11,11 +11,83 @@ See `.doc/product-definition.md` for the acceptance criteria QA checks against, 
 `.doc/ingredient.md` for the approved ingredient list every potion is built from.
 
 Current queue:
-- [ ] brew a potion from a trouble | stack:full
+- [ ] the potion on screen
 
-  Version one end to end: text box and chips, `POST /api/potion`, both generators
-  behind one interface, the filter, and the potion on screen. Acceptance criteria
-  AC1 to AC15.
+  One screen, one fixed potion, no service. The text box, the `chip` row, the Brew
+  button, the emoji witch, and a potion rendered in full — name, ingredients, ordered
+  steps, closing line, and the never-drink-it notice. Brew shows the same hard-coded
+  potion every time. Scaffolds `frontend/` with Vite, Tailwind v4, Vitest and Playwright.
+  Acceptance criteria AC4, AC6 (the empty-trouble message), AC14, AC14a.
+
+  This is also the task that sets up the toolchain both packages then follow:
+  `eslint` 10, `typescript-eslint` 8, `prettier` 3 and `eslint-config-prettier` 10, with a
+  flat `eslint.config.js` per package and one shared `.prettierrc` at the repository root.
+  `eslint-config-prettier` goes last in the config array. Prettier keeps its defaults —
+  semicolons included — so there is no house style to learn. Add `lint` and `format`
+  scripts and run them in the same breath as `npx tsc --noEmit`; AC15 is a gate, not a
+  suggestion.
+
+  The fixed potion is a fixture, not a fallback. It lives in a fixture file, it is the
+  only potion data that will ever exist in `frontend/`, and the next task deletes it. The
+  frontend must never learn what is on the approved list — that is one source of truth
+  for a child-safety rule, and it lives in the service.
+
+  This slice exists to make the layout real before any of the generation logic does. It
+  is the one that proves a recipe stays readable across a table while both pairs of hands
+  are busy, which is a design question, not an engineering one.
+
+- [ ] brew without a key | stack:full
+
+  Scaffolds `backend/` and makes the app work end to end with no `ANTHROPIC_API_KEY` at
+  all. The ingredient data and the test asserting it matches `.doc/ingredient.md`, the
+  generator interface, the `offline generator`, the filter, the potion schema, and
+  `POST /api/potion`. The screen drops its fixture and calls the route. `backend/` gets
+  its own `eslint.config.js` mirroring the frontend's and shares the root `.prettierrc`.
+  Acceptance criteria AC1, AC2, AC2a, AC3, AC5, AC6, AC7, AC7a, AC8, AC9, AC10, AC12,
+  AC13. AC15 covers every slice.
+
+  The filter ships here even though nothing it defends against exists yet. The `offline
+  generator` cannot produce an unapproved ingredient, so every check is redundant on this
+  path by design — which is the point. A single filter with no bypass is easier to prove
+  correct than two paths with different guarantees, and the drop-and-cascade rules of AC2
+  and AC2a are unit-testable against synthetic candidates without a model in the loop.
+
+  Three things are unowned and must be settled in the plan's open questions before any
+  code is written.
+
+  AC7a caps trouble-tagged ingredients at three, but twelve of the thirteen neutral pool
+  entries carry tags of their own. For `worried` the pool alone contributes flour, salt,
+  a smooth pebble and a scrap of tissue paper — four — before the one to three deliberate
+  matches. `sad` and `bored` fail the same way. The offline generator's own construction
+  rule breaks the criterion, so either the cap counts only the deliberate matches or AC7a
+  changes.
+
+  AC7a also has no component. It is not one of the filter's four checks, and it cannot
+  simply become the fifth: the architecture states the offline potion can only pass the
+  filter, and that stops being true the moment AC7a can reject. The same gap applies to
+  the trouble-to-feeling-tag mapping AC7a rests on — free text in, tag out, and nothing
+  in the component table owns it.
+
+  AC2a cascades a dropped ingredient into the steps. That is clean if a step structurally
+  references the ingredients it uses, and substring matching on child-facing prose if not.
+  The step shape is the decision underneath it.
+
+  Two smaller ones for the ingredient data: `hopeful` is used as a tag but is missing from
+  the tag list — sixteen listed plus `hopeful` is the seventeen the starter kit counts on —
+  and `base` on the water is a pseudo-tag that needs somewhere to live in the data model.
+
+- [ ] let the witch write it | stack:full
+
+  Adds the `witch generator`: the versioned prompt file, the Claude call, reply parsing,
+  the request timeout, and generator selection on whether the key is present. Every
+  failure on this path — timeout, malformed reply, schema mismatch, too few surviving
+  ingredients — degrades to the offline potion rather than surfacing an error.
+  Acceptance criteria AC11, plus AC1 to AC5 and AC13 re-proven on the Claude path.
+
+  Last rather than first because it is the only slice that needs a key, costs money per
+  run, and cannot be tested deterministically. By the time it lands, the filter it feeds
+  is already proven and the screen already works without it — so this is a generator
+  swapped in behind an interface, not a new path through the app.
 
 - [ ] draw the witch
 
