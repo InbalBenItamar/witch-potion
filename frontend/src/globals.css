@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --color-background: #fdf6ec;
+  --color-surface: #ffffff;
+  --color-foreground: #2b1d3d;
+  --color-primary: #6b3fa0;
+  --color-primary-hover: #55307f;
+  --color-accent: #ffb703;
+  --color-muted: #8a7ba0;
+  --color-border: #e4d9f2;
+  --color-danger: #b3261e;
+
+  /* Pinned in px, not rem: AC14a is a hard floor, not something a page-zoom
+     reset or an ancestor's font-size should be able to shrink below 18px. */
+  --font-size-body: 18px;
+  --font-size-heading: 28px;
+  --font-size-title: 36px;
+
+  --spacing-tap-target: 44px; /* AC14a floor */
+
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-foreground: var(--color-foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-accent: var(--color-accent);
+  --color-muted: var(--color-muted);
+  --color-border: var(--color-border);
+  --color-danger: var(--color-danger);
+
+  --font-size-body: var(--font-size-body);
+  --font-size-heading: var(--font-size-heading);
+  --font-size-title: var(--font-size-title);
+
+  --spacing-tap-target: var(--spacing-tap-target);
+  --spacing-xs: var(--spacing-xs);
+  --spacing-sm: var(--spacing-sm);
+  --spacing-md: var(--spacing-md);
+  --spacing-lg: var(--spacing-lg);
+  --spacing-xl: var(--spacing-xl);
+
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-size: var(--font-size-body);
+}
