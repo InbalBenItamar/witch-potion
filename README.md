@@ -9,9 +9,10 @@ and answers it with petals, glitter and a fizz.
 
 ## Status
 
-Version one is **not built yet**. This repository currently holds the product documents,
-the approved ingredient list, and the agent scaffolding that will build it. The commands
-under Running it below describe the intended shape and do not work yet.
+`frontend/` exists and runs. The screen — text box, chips, Brew, the potion — is built
+against a fixed fixture potion, with no service and no key required; `npm run dev` in
+`frontend/` works today. `backend/` does not exist yet, so nothing is generated: Brew
+always shows the same potion. See `.plan/000-backlog.md` for what is queued next.
 
 ## How it works
 
@@ -33,9 +34,12 @@ witch's potion will reach for eye of newt sooner or later. The list is what stop
 ## Running it
 
 ```bash
-npm install          # in frontend/ and backend/
-npm run dev          # in both
+cd frontend && npm install && npm run dev
 ```
+
+`backend/` does not exist yet, so this runs the screen against a fixed fixture potion —
+Brew always shows the same one. The commands below describe the intended shape once the
+service lands.
 
 The witch works with no API key at all — the offline generator needs nothing. To get
 Claude-written potions, copy `.env.example` to `backend/.env` and add a key from

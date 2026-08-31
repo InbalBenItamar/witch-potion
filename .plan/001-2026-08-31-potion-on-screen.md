@@ -146,7 +146,8 @@ QA's checklist. Every item is a command or a test.
 | 9 | E2E at 375×667 — `document.documentElement.scrollWidth <= clientWidth` | AC14 |
 | 10 | E2E — every rendered potion text node computes to `font-size >= 18px` | AC14a |
 | 11 | E2E — every interactive element's bounding box is at least 44×44 | AC14a |
-| 12 | Repository check — no file under `frontend/` other than the fixture contains an ingredient name, and nothing imports `.doc/ingredient.md` | scope guard |
+| 12 | Repository check — no *shipped* file under `frontend/` other than the fixture contains an ingredient name (tests may construct realistic synthetic data), and nothing imports `.doc/ingredient.md` | scope guard |
+| 13 | Unit — a 7-ingredient, 5-step potion renders every ingredient and every step, none dropped | layout risk below |
 
 Check 12 is the one worth keeping past this task. It is the mechanical form of the rule in
 `.claude/agents/frontend.md`: the frontend must never learn what is on the approved list,
