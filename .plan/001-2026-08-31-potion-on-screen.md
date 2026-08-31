@@ -1,7 +1,7 @@
 # 001 — The potion on screen
 
-Status: draft
-Owner: unassigned — set on approval
+Status: active
+Owner: frontend agent (via Claude Code)
 Last updated: 2026-08-31
 
 Backlog task: `the potion on screen` (frontend-only — not marked `stack:full`).
