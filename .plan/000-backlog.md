@@ -11,31 +11,6 @@ See `.doc/product-definition.md` for the acceptance criteria QA checks against, 
 `.doc/ingredient.md` for the approved ingredient list every potion is built from.
 
 Current queue:
-- [ ] the potion on screen
-
-  One screen, one fixed potion, no service. The text box, the `chip` row, the Brew
-  button, the emoji witch, and a potion rendered in full — name, ingredients, ordered
-  steps, closing line, and the never-drink-it notice. Brew shows the same hard-coded
-  potion every time. Scaffolds `frontend/` with Vite, Tailwind v4, Vitest and Playwright.
-  Acceptance criteria AC4, AC6 (the empty-trouble message), AC14, AC14a.
-
-  This is also the task that sets up the toolchain both packages then follow:
-  `eslint` 10, `typescript-eslint` 8, `prettier` 3 and `eslint-config-prettier` 10, with a
-  flat `eslint.config.js` per package and one shared `.prettierrc` at the repository root.
-  `eslint-config-prettier` goes last in the config array. Prettier keeps its defaults —
-  semicolons included — so there is no house style to learn. Add `lint` and `format`
-  scripts and run them in the same breath as `npx tsc --noEmit`; AC15 is a gate, not a
-  suggestion.
-
-  The fixed potion is a fixture, not a fallback. It lives in a fixture file, it is the
-  only potion data that will ever exist in `frontend/`, and the next task deletes it. The
-  frontend must never learn what is on the approved list — that is one source of truth
-  for a child-safety rule, and it lives in the service.
-
-  This slice exists to make the layout real before any of the generation logic does. It
-  is the one that proves a recipe stays readable across a table while both pairs of hands
-  are busy, which is a design question, not an engineering one.
-
 - [ ] brew without a key | stack:full
 
   Scaffolds `backend/` and makes the app work end to end with no `ANTHROPIC_API_KEY` at
@@ -179,3 +154,16 @@ Current queue:
   on a call. Do not bury it in a settings screen.
 
 ## DONE
+
+- [x] the potion on screen
+
+  One screen, one fixed potion, no service. The text box, the `chip` row, the Brew
+  button, the emoji witch, and a potion rendered in full — name, ingredients, ordered
+  steps, closing line, and the never-drink-it notice. Brew shows the same hard-coded
+  potion every time. Scaffolds `frontend/` with Vite, Tailwind v4, Vitest and Playwright.
+  Acceptance criteria AC4, AC6 (the empty-trouble message), AC14, AC14a — all met; see
+  `.plan/001-2026-08-31-potion-on-screen.md`.
+
+  Shipped as a full-screen potion view rather than the inline layout first planned —
+  Brew replaces the form with the potion and a Back control, decided over an overlay
+  modal for accessibility reasons recorded in that plan's Q5. Merged to `main` 2026-09-03.

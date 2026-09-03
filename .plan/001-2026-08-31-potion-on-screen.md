@@ -1,6 +1,6 @@
 # 001 — The potion on screen
 
-Status: active
+Status: done
 Owner: frontend agent (via Claude Code)
 Last updated: 2026-09-03
 
