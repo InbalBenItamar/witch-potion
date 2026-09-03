@@ -1,8 +1,11 @@
+import type { RefObject } from "react";
+
 interface TroubleBoxProps {
   value: string;
   onChange: (value: string) => void;
   error: string | null;
   disabled: boolean;
+  inputRef?: RefObject<HTMLTextAreaElement | null>;
 }
 
 export function TroubleBox({
@@ -10,6 +13,7 @@ export function TroubleBox({
   onChange,
   error,
   disabled,
+  inputRef,
 }: TroubleBoxProps) {
   return (
     <div className="flex flex-col gap-2">
@@ -22,6 +26,7 @@ export function TroubleBox({
       <textarea
         id="trouble"
         name="trouble"
+        ref={inputRef}
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}

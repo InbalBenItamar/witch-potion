@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { fixturePotion } from "../fixture/potion";
 import type { Potion } from "../type/potion";
 import { PotionCard } from "./PotionCard";
@@ -48,7 +49,7 @@ const maxLengthPotion: Potion = {
 
 describe("PotionCard", () => {
   it("renders the name, every ingredient, every step in order, and the closing line", () => {
-    render(<PotionCard potion={fixturePotion} />);
+    render(<PotionCard potion={fixturePotion} onBack={vi.fn()} />);
 
     expect(screen.getByText(fixturePotion.name)).toBeInTheDocument();
 
@@ -68,12 +69,22 @@ describe("PotionCard", () => {
   });
 
   it("always shows the never-drink-it notice", () => {
-    render(<PotionCard potion={fixturePotion} />);
+    render(<PotionCard potion={fixturePotion} onBack={vi.fn()} />);
     expect(screen.getByText(/not for eating or drinking/i)).toBeInTheDocument();
   });
 
+  it("calls onBack when the Back button is clicked", async () => {
+    const onBack = vi.fn();
+    const user = userEvent.setup();
+    render(<PotionCard potion={fixturePotion} onBack={onBack} />);
+
+    await user.click(screen.getByRole("button", { name: /back/i }));
+
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
   it("renders a maximum-length potion — 7 ingredients, 5 steps — without dropping any", () => {
-    render(<PotionCard potion={maxLengthPotion} />);
+    render(<PotionCard potion={maxLengthPotion} onBack={vi.fn()} />);
 
     expect(screen.getByText(maxLengthPotion.name)).toBeInTheDocument();
     for (const item of maxLengthPotion.ingredient) {

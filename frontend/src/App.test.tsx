@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
@@ -70,6 +70,69 @@ describe("App", () => {
     resolveBrew(fixturePotion);
 
     expect(await screen.findByText(fixturePotion.name)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^brew$/i })).toBeEnabled();
+    expect(
+      screen.queryByRole("button", { name: /^brew$/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("moves focus to the potion name once it is shown", async () => {
+    const { brewPotion } = await import("./lib/brew");
+    vi.mocked(brewPotion).mockResolvedValue(fixturePotion);
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(
+      screen.getByLabelText(/what is bothering you/i),
+      "i miss someone",
+    );
+    await user.click(screen.getByRole("button", { name: /^brew$/i }));
+
+    const heading = await screen.findByRole("heading", {
+      level: 2,
+      name: fixturePotion.name,
+    });
+    await waitFor(() => expect(heading).toHaveFocus());
+  });
+
+  it("returns to the form with the trouble intact when Back is clicked", async () => {
+    const { brewPotion } = await import("./lib/brew");
+    vi.mocked(brewPotion).mockResolvedValue(fixturePotion);
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(
+      screen.getByLabelText(/what is bothering you/i),
+      "i miss someone",
+    );
+    await user.click(screen.getByRole("button", { name: /^brew$/i }));
+    await screen.findByText(fixturePotion.name);
+
+    await user.click(screen.getByRole("button", { name: /back/i }));
+
+    const troubleBox = screen.getByLabelText(/what is bothering you/i);
+    expect(troubleBox).toHaveValue("i miss someone");
+    await waitFor(() => expect(troubleBox).toHaveFocus());
+  });
+
+  it("returns to the form when Escape is pressed while presenting", async () => {
+    const { brewPotion } = await import("./lib/brew");
+    vi.mocked(brewPotion).mockResolvedValue(fixturePotion);
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(
+      screen.getByLabelText(/what is bothering you/i),
+      "i miss someone",
+    );
+    await user.click(screen.getByRole("button", { name: /^brew$/i }));
+    await screen.findByText(fixturePotion.name);
+
+    await user.keyboard("{Escape}");
+
+    expect(screen.getByLabelText(/what is bothering you/i)).toBeVisible();
+    expect(screen.queryByText(fixturePotion.name)).not.toBeInTheDocument();
   });
 });

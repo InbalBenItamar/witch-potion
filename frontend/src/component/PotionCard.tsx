@@ -1,9 +1,25 @@
+import type { RefObject } from "react";
 import type { Potion } from "../type/potion";
+import { BackButton } from "./BackButton";
 
-export function PotionCard({ potion }: { potion: Potion }) {
+interface PotionCardProps {
+  potion: Potion;
+  onBack: () => void;
+  headingRef?: RefObject<HTMLHeadingElement | null>;
+}
+
+export function PotionCard({ potion, onBack, headingRef }: PotionCardProps) {
   return (
     <article className="flex flex-col gap-md rounded-lg border-2 border-border bg-surface p-lg">
-      <h2 className="text-title font-bold text-primary">{potion.name}</h2>
+      <BackButton onClick={onBack} />
+
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="text-title font-bold text-primary focus:outline-none"
+      >
+        {potion.name}
+      </h2>
 
       <div>
         <h3 className="text-heading font-semibold">Ingredients</h3>

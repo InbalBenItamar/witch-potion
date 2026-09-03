@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.use({ viewport: { width: 375, height: 667 } });
 
-test("has no horizontal scroll at 375px", async ({ page }) => {
+test("has no horizontal scroll while waiting", async ({ page }) => {
   await page.goto("/");
 
   const overflow = await page.evaluate(
@@ -43,11 +43,9 @@ test("body and potion text render at 18px or larger", async ({ page }) => {
   }
 });
 
-test("every interactive target is at least 44 by 44 pixels", async ({
-  page,
-}) => {
-  await page.goto("/");
-
+async function expectAllTargetsAreTappable(
+  page: import("@playwright/test").Page,
+) {
   const targets = page.locator("button, textarea, input, a");
   const count = await targets.count();
   expect(count).toBeGreaterThan(0);
@@ -60,4 +58,40 @@ test("every interactive target is at least 44 by 44 pixels", async ({
       expect(box.height).toBeGreaterThanOrEqual(44);
     }
   }
+}
+
+test("every interactive target is at least 44 by 44 pixels while waiting", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expectAllTargetsAreTappable(page);
+});
+
+test("every interactive target is at least 44 by 44 pixels while presenting", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByLabel(/what is bothering you/i).fill("i am bored");
+  await page.getByRole("button", { name: /^brew$/i }).click();
+  await expect(page.getByRole("heading", { level: 2 })).toBeVisible({
+    timeout: 5000,
+  });
+
+  await expectAllTargetsAreTappable(page);
+});
+
+test("has no horizontal scroll while presenting", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel(/what is bothering you/i).fill("i am bored");
+  await page.getByRole("button", { name: /^brew$/i }).click();
+  await expect(page.getByRole("heading", { level: 2 })).toBeVisible({
+    timeout: 5000,
+  });
+
+  const overflow = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth <=
+      document.documentElement.clientWidth,
+  );
+  expect(overflow).toBe(true);
 });

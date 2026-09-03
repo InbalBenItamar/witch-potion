@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BrewButton } from "./component/BrewButton";
 import { ChipRow } from "./component/ChipRow";
 import { PotionCard } from "./component/PotionCard";
@@ -14,6 +14,10 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [brewState, setBrewState] = useState<BrewState>("waiting");
   const [potion, setPotion] = useState<Potion | null>(null);
+
+  const troubleRef = useRef<HTMLTextAreaElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const isFirstRender = useRef(true);
 
   const handleTroubleChange = (value: string) => {
     setTrouble(value);
@@ -33,29 +37,63 @@ export function App() {
     setBrewState("presenting");
   };
 
+  const handleBack = () => {
+    setBrewState("waiting");
+  };
+
+  // Move focus to whatever the child should read next — the potion's name
+  // on Brew, back to the trouble box on return — but not on first mount,
+  // when brewState is already "waiting" and nothing has been read yet.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (brewState === "presenting") headingRef.current?.focus();
+    if (brewState === "waiting") troubleRef.current?.focus();
+  }, [brewState]);
+
+  useEffect(() => {
+    if (brewState !== "presenting") return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") handleBack();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [brewState]);
+
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-lg p-lg">
       <Witch state={brewState} />
 
-      <TroubleBox
-        value={trouble}
-        onChange={handleTroubleChange}
-        error={error}
-        disabled={brewState === "brewing"}
-      />
+      {brewState === "presenting" && potion ? (
+        <PotionCard
+          potion={potion}
+          onBack={handleBack}
+          headingRef={headingRef}
+        />
+      ) : (
+        <>
+          <TroubleBox
+            value={trouble}
+            onChange={handleTroubleChange}
+            error={error}
+            disabled={brewState === "brewing"}
+            inputRef={troubleRef}
+          />
 
-      <ChipRow
-        onSelect={handleTroubleChange}
-        disabled={brewState === "brewing"}
-      />
+          <ChipRow
+            onSelect={handleTroubleChange}
+            disabled={brewState === "brewing"}
+          />
 
-      <BrewButton
-        onClick={handleBrew}
-        disabled={brewState === "brewing"}
-        brewing={brewState === "brewing"}
-      />
-
-      {brewState === "presenting" && potion && <PotionCard potion={potion} />}
+          <BrewButton
+            onClick={handleBrew}
+            disabled={brewState === "brewing"}
+            brewing={brewState === "brewing"}
+          />
+        </>
+      )}
     </main>
   );
 }
