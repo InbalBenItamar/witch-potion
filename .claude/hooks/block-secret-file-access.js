@@ -9,17 +9,36 @@
 // The repo root .env holds LINEAR_API_KEY, which is exactly what the dev-loop
 // sub-agents must never read back out or echo into a report.
 //
-// Runs even when AGENT_PERMISSION_MODE=bypassPermissions (dev-loop.js's
+// Runs even when CLAUDE_PERMISSION_MODE=bypassPermissions (dev-loop.js's
 // default for the FE/BE/QA sub-agents) - hooks are a separate enforcement
 // layer from the permission system, which is exactly why this demo relies
 // on them instead of permissions.deny alone.
 
 // Matches a real env file anywhere in the tree - the repo root `.env` (which
-// holds LINEAR_API_KEY), plus any future frontend/.env or
-// backend/.env. `.env.example` is deliberately NOT matched: it is committed
-// template content agents are allowed to read and write.
-const SECRET_FILE_PATTERN = /(^|[\/\\])\.env(\.local|\.development|\.production)?(?![\w.-])/i
-const SECRET_IN_COMMAND_PATTERN = /(^|[\s"'=/\\])[\w./\\-]*\.env(\.local|\.development|\.production)?(?![\w.-])/i
+// holds LINEAR_API_KEY), plus any future frontend/.env or backend/.env.
+//
+// Suffixes are matched open-endedly (`.env.local`, `.env.test`, `.env.staging`,
+// `.env.production.local`) rather than enumerated, because an enumerated list
+// silently fails open on the one suffix nobody thought of. The template
+// suffixes are then carved back out: `.env.example` / `.sample` / `.template`
+// are committed content agents are allowed to read and write.
+const ENV_SUFFIX = /\.env(?!\.(?:example|sample|template)(?![\w.-]))(?:\.[\w-]+)*(?![\w.-])/.source
+
+// Path fields: the env file must be a whole path segment, so `src/env.ts` and
+// `.envrc` don't match.
+const SECRET_FILE_PATTERN = new RegExp(`(^|[/\\\\])${ENV_SUFFIX}`, 'i')
+
+// Command strings: whatever precedes `.env` must be empty or end in a path
+// separator. Without that anchor the pattern also swallows `import.meta.env`
+// and `process.env` - see the warning in block-destructive-bash.js, which is
+// where that exact mistake was made before.
+//
+// Known false positive, accepted deliberately: a regex-escaped `process\.env`
+// typed into a grep is indistinguishable from the Windows path `process\` +
+// `.env`, so it gets blocked. Backslash has to stay a separator for `type
+// frontend\.env` to be caught, and over-blocking a search beats under-blocking
+// a read. Search for the unescaped string instead.
+const SECRET_IN_COMMAND_PATTERN = new RegExp(`(^|[\\s"'=;|&(])(?:[\\w.\\\\/-]*[\\\\/])?${ENV_SUFFIX}`, 'i')
 
 // Only fields that NAME a target are inspected. Deliberately not scanning the
 // whole tool_input: a Write's `content` can legitimately mention an env file

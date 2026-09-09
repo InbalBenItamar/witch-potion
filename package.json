@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "scripts": {
+    "dev-loop": "node dev-loop.js",
+    "demo:reset": "node demo-reset.mjs",
+    "verify:guardrails": "node verify-guardrails.mjs",
+    "trace:agent": "node trace-agent.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
