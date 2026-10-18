@@ -9,10 +9,10 @@ and answers it with petals, glitter and a fizz.
 
 ## Status
 
-`frontend/` exists and runs. The screen — text box, chips, Brew, the potion — is built
-against a fixed fixture potion, with no service and no key required; `npm run dev` in
-`frontend/` works today. `backend/` does not exist yet, so nothing is generated: Brew
-always shows the same potion. See `.plan/000-backlog.md` for what is queued next.
+The app works end to end with no API key. `frontend/` posts the trouble to
+`backend/`, whose offline generator brews a fresh potion from the approved list every
+time, and the filter checks it before it reaches the screen. The witch generator — the
+Claude path — is not built yet. See `.plan/000-backlog.md` for what is queued next.
 
 ## How it works
 
@@ -33,24 +33,30 @@ witch's potion will reach for eye of newt sooner or later. The list is what stop
 
 ## Running it
 
+Two processes, one terminal each:
+
 ```bash
-cd frontend && npm install && npm run dev
+cd backend && npm install && npm run dev     # Node service on http://localhost:8787
+cd frontend && npm install && npm run dev    # the app on http://localhost:5173
 ```
 
-`backend/` does not exist yet, so this runs the screen against a fixed fixture potion —
-Brew always shows the same one. The commands below describe the intended shape once the
-service lands.
+Vite proxies `/api` to the backend, so open the app's address and brew. If 5173 is
+taken, pass another port: `npm run dev -- --port 5180`. The backend's port is `PORT`
+(default `8787`); see `backend/.env.example`.
 
-The witch works with no API key at all — the offline generator needs nothing. To get
-Claude-written potions, copy `.env.example` to `backend/.env` and add a key from
-[platform.claude.com](https://platform.claude.com/dashboard):
+Tests run with no network and no key:
 
-```env
-ANTHROPIC_API_KEY=your-key-here
+```bash
+cd backend && npm test                        # unit + route tests
+cd frontend && npm test                       # unit tests
+cd frontend && npm run test:e2e               # Playwright; starts both servers on 8787 and 5199
 ```
 
-The key is read only by the Node service and never reaches the browser. `.env` is
-gitignored — do not commit it.
+The witch works with no API key at all — the offline generator needs nothing. Once the
+witch generator lands, Claude-written potions will need a key: copy
+`backend/.env.example` to `backend/.env` and add one from
+[platform.claude.com](https://platform.claude.com/dashboard). The key is read only by the
+Node service and never reaches the browser. `.env` is gitignored — do not commit it.
 
 ## Repository map
 
@@ -65,7 +71,9 @@ gitignored — do not commit it.
 | `.claude/skills/` | On-demand procedural playbooks |
 | `.claude/agents/` | Role definitions for orchestrator, frontend, backend, qa, and security-reviewer |
 | `.claude/hooks/` | Runtime guardrails that enforce boundaries and safety |
-| `.orchestrate/` | Generated outputs from the latest dev-loop run |
+| `frontend/` | The React + Vite app — text box, chips, Brew, the potion |
+| `backend/` | The Node service — `POST /api/potion`, generators, filter, ingredient data |
+| `.orchestrate/` | Generated outputs from the latest dev-loop run (gitignored) |
 | `AGENTS.md` | Canonical operating rules and guardrails for all agents |
 | `CLAUDE.md` | Loads AGENTS.md into compatible runtimes |
 
@@ -73,7 +81,10 @@ gitignored — do not commit it.
 
 1. Add or prioritize tasks in `.plan/000-backlog.md`.
 2. Create or update an implementation plan in `.plan/NNN-YYYY-MM-DD-topic.md`.
-3. Execute the dev loop in your local environment.
+3. Run the dev loop from the repo root: `npm run dev-loop`. It plans, waits for
+   `APPROVED`, runs the frontend, backend and QA agents, and waits again. It never
+   commits, and it refuses to start on uncommitted changes. Check the hooks first with
+   `npm run verify:guardrails`.
 4. Review generated artifacts in `.orchestrate/`.
 5. Validate acceptance criteria against `.doc/product-definition.md`.
 
