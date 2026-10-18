@@ -53,6 +53,11 @@
 	  matches a trouble against these to choose ingredients.
 	- Use: `feeling tag` in prose, `tag` in code where the context is an ingredient.
 	  Never `mood`, `emotion`, `category`, or `label`.
+- `feeling matcher`
+	- Canonical meaning: the component that turns a trouble's free text into exactly one
+	  feeling tag. It always returns one — a trouble that names no feeling gets the
+	  default tag — so every brew has a feeling to answer.
+	- Use: `feeling matcher`, never `classifier`, `detector`, or `analyzer`.
 
 ## Naming Alignment
 - Keep this glossary aligned with naming decisions in `../.claude/rules/naming.md`.

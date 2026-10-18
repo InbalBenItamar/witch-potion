@@ -18,8 +18,8 @@ Current queue:
   generator interface, the `offline generator`, the filter, the potion schema, and
   `POST /api/potion`. The screen drops its fixture and calls the route. `backend/` gets
   its own `eslint.config.js` mirroring the frontend's and shares the root `.prettierrc`.
-  Acceptance criteria AC1, AC2, AC2a, AC3, AC5, AC6, AC7, AC7a, AC8, AC9, AC10, AC12,
-  AC13. AC15 covers every slice.
+  Acceptance criteria AC1, AC2, AC2a, AC3, AC5, AC6, AC7, AC7a, AC7b, AC8, AC9, AC10,
+  AC12, AC13. AC15 covers every slice.
 
   The filter ships here even though nothing it defends against exists yet. The `offline
   generator` cannot produce an unapproved ingredient, so every check is redundant on this
@@ -27,29 +27,26 @@ Current queue:
   correct than two paths with different guarantees, and the drop-and-cascade rules of AC2
   and AC2a are unit-testable against synthetic candidates without a model in the loop.
 
-  Three things are unowned and must be settled in the plan's open questions before any
-  code is written.
+  Decided 2026-10-18 — the plan builds on these, it does not reopen them:
 
-  AC7a caps trouble-tagged ingredients at three, but twelve of the thirteen neutral pool
-  entries carry tags of their own. For `worried` the pool alone contributes flour, salt,
-  a smooth pebble and a scrap of tissue paper — four — before the one to three deliberate
-  matches. `sad` and `bored` fail the same way. The offline generator's own construction
-  rule breaks the criterion, so either the cap counts only the deliberate matches or AC7a
-  changes.
+  - **No cap on matched ingredients.** AC7a is now "at least one", with no upper limit.
+    The old three-cap clashed with the neutral pool, several of whose entries carry the
+    same tags.
+  - **Water in every potion** (new AC7b). In the data it is a flag of its own, not a
+    feeling tag — that retires the `base` pseudo-tag. No new liquids added.
+  - **The `feeling matcher` owns trouble → tag**, and always returns a tag: a trouble
+    that names no feeling gets a default tag defined in the ingredient data. Because of
+    that, AC7a and AC7b become the filter's fifth check, `composition`, and the offline
+    potion still can only pass. Which tag is the default, and how text is matched
+    (keyword list or otherwise), are for the plan.
+  - **`hopeful` is added to the tag list** in `.doc/ingredient.md` — seventeen tags.
 
-  AC7a also has no component. It is not one of the filter's four checks, and it cannot
-  simply become the fifth: the architecture states the offline potion can only pass the
-  filter, and that stops being true the moment AC7a can reject. The same gap applies to
-  the trouble-to-feeling-tag mapping AC7a rests on — free text in, tag out, and nothing
-  in the component table owns it.
+  Still open, recommended answer below — confirm or change at the plan gate:
 
-  AC2a cascades a dropped ingredient into the steps. That is clean if a step structurally
-  references the ingredients it uses, and substring matching on child-facing prose if not.
-  The step shape is the decision underneath it.
-
-  Two smaller ones for the ingredient data: `hopeful` is used as a tag but is missing from
-  the tag list — sixteen listed plus `hopeful` is the seventeen the starter kit counts on —
-  and `base` on the water is a pseudo-tag that needs somewhere to live in the data model.
+  - **Step shape for the AC2a cascade.** Recommended: each step carries its verb and the
+    ingredients it uses as fields, beside the child-facing text — `{ verb, ingredients,
+    text }`. The cascade is then a list check rather than substring matching on prose,
+    and AC5's verb check reads the field instead of parsing a sentence.
 
 - [ ] let the witch write it | stack:full
 
