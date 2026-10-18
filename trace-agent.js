@@ -33,6 +33,9 @@ const CLAUDE_PERMISSION_MODE =
   process.env.CLAUDE_PERMISSION_MODE ||
   getArg("--claude-permission-mode") ||
   "bypassPermissions";
+// Same variable dev-loop.js reads, so one .env line switches both.
+const CLAUDE_MODEL =
+  process.env.CLAUDE_MODEL || getArg("--model") || "claude-opus-4-8";
 const TRACE_FILE = ".orchestrate/trace-live.json";
 
 if (!TASK) {
@@ -75,7 +78,7 @@ async function main() {
 
   const args = [
     "--model",
-    "claude-opus-4-8",
+    CLAUDE_MODEL,
     "--permission-mode",
     CLAUDE_PERMISSION_MODE,
     "--add-dir",
