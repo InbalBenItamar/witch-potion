@@ -11,7 +11,7 @@ See `.doc/product-definition.md` for the acceptance criteria QA checks against, 
 `.doc/ingredient.md` for the approved ingredient list every potion is built from.
 
 Current queue:
-- [ ] brew without a key | stack:full
+- [x] brew without a key | stack:full
 
   Scaffolds `backend/` and makes the app work end to end with no `ANTHROPIC_API_KEY` at
   all. The ingredient data and the test asserting it matches `.doc/ingredient.md`, the
