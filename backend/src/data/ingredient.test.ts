@@ -70,12 +70,12 @@ function parseNeutralPool(): string[] {
 const sorted = (xs: readonly string[]) => [...xs].sort();
 
 describe("ingredient data matches .doc/ingredient.md", () => {
-  it("lists the same seventeen feeling tags, in order", () => {
+  it("lists the same eighteen feeling tags, in order", () => {
     const tagsBlock = section("## Feeling tags", "## Kitchen cupboard").split(
       "**Default tag:**",
     )[0];
     expect(backticks(tagsBlock)).toEqual([...FEELING_TAG]);
-    expect(FEELING_TAG).toHaveLength(17);
+    expect(FEELING_TAG).toHaveLength(18);
   });
 
   it("records the same default tag", () => {

@@ -6,7 +6,7 @@
  * change it there first, then follow it here.
  */
 
-/** The seventeen feeling tags, in the order the doc lists them. */
+/** The eighteen feeling tags, in the order the doc lists them. */
 export const FEELING_TAG = [
   "scared",
   "worried",
@@ -25,6 +25,7 @@ export const FEELING_TAG = [
   "disappointed",
   "stuck",
   "hopeful",
+  "excited",
 ] as const;
 
 export type FeelingTag = (typeof FEELING_TAG)[number];
@@ -263,7 +264,12 @@ export const INGREDIENT: Ingredient[] = [
     water: false,
     neutral: false,
   },
-  { name: "a pom-pom", tag: ["bored", "sad"], water: false, neutral: true },
+  {
+    name: "a pom-pom",
+    tag: ["bored", "sad", "excited"],
+    water: false,
+    neutral: true,
+  },
   {
     name: "a stick of chalk",
     tag: ["embarrassed"],

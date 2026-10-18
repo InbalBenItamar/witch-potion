@@ -24,7 +24,7 @@ Each ingredient answers one or more feelings. The generators match a trouble to 
 
 `scared` · `worried` · `lonely` · `left-out` · `sad` · `angry` · `frustrated` ·
 `jealous` · `bored` · `restless` · `embarrassed` · `tired` · `missing-someone` ·
-`nervous` · `disappointed` · `stuck` · `hopeful`
+`nervous` · `disappointed` · `stuck` · `hopeful` · `excited`
 
 **Default tag:** `hopeful`. When the feeling matcher cannot find a feeling in the
 trouble, it answers with this one, so every trouble still gets a potion.
@@ -78,7 +78,7 @@ trouble, it answers with this one, so every trouble still gets a potion.
 | a piece of string | missing-someone | A line between here and there |
 | a cotton wool ball | scared, sad | Something soft to land on |
 | a paper star, cut out | nervous, hopeful | You made the wish yourself |
-| a pom-pom | bored, sad | Cheerful for no reason at all |
+| a pom-pom | bored, sad, excited | Cheerful for no reason at all |
 | a stick of chalk | embarrassed | Everything chalk does can be rubbed out |
 | a crayon shaving | tired, frustrated | Worn down and still full of colour |
 | a scrap of tissue paper | worried | So light it floats off |
@@ -114,17 +114,17 @@ and the rest is what makes it a potion.
 
 ## Starter kit
 
-The set to tick if you only tick one set. Sixteen ingredients: eleven that between them
-cover **all seventeen feeling tags**, plus five neutrals so the potion has body and
+The set to tick if you only tick one set. Seventeen ingredients that between them
+cover **all eighteen feeling tags**, with neutrals among them so the potion has body and
 sparkle. With these in the house, the witch can brew for any trouble a child types.
 
 Kitchen: flour · sugar · salt · lemon juice · baking soda · cocoa powder · dry rice ·
 a dried pasta star · a sunflower seed · a breadcrumb · water
 
 Craft drawer: edible glitter · food colouring · a length of ribbon · a piece of string ·
-a stick of chalk
+a stick of chalk · a pom-pom
 
-Nine of the sixteen are ordinary kitchen staples, which is deliberate — a family should
+Nine of the seventeen are ordinary kitchen staples, which is deliberate — a family should
 be able to start today rather than after a shopping trip. The lemon juice and baking soda
 are the pair that fizz.
 

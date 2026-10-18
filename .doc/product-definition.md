@@ -85,15 +85,19 @@ Each criterion must be provable by a test. The QA agent marks these PASS/FAIL pe
   in that potion and a verb from the approved list in `.doc/ingredient.md`. No heat, no
   cutting, no tasting. Enforced by the filter on both generator paths — a candidate with
   an unapproved verb is discarded and the offline potion served instead.
-- AC6 — Input: clicking a chip fills the text box; submitting an empty or whitespace-only
-  trouble is refused with a friendly message and produces no potion.
+- AC6 — Input. In witch mode, clicking a chip fills the text box, and submitting an
+  empty or whitespace-only trouble is refused with a friendly message and produces no
+  potion. In offline mode, the child picks one of ten feeling chips; the text box is shown
+  greyed out with a short explanation of why the witch cannot read it right now; Brew
+  stays disabled until a feeling is picked, so an empty brew cannot be sent.
 - AC7 — Potion shape: name, five to seven ingredients as generated, at least three
   ordered steps, and a closing line. Validated against a schema on both paths.
 - AC7a — Every potion is about the trouble: at least one ingredient carries a feeling tag
   matching the trouble. There is no upper limit — the rest may be any approved
   ingredient, matched or not. A potion with zero matched ingredients is not a potion for
   that trouble and is rejected. Every trouble resolves to a feeling tag, including one
-  that names no feeling at all, so a potion can always meet this.
+  that names no feeling at all, so a potion can always meet this. In offline mode the
+  picked feeling chip is the feeling tag, and the potion must match it.
 - AC7b — Every potion has a liquid: half a cup of water is in every served potion.
 - AC8 — Variation: the same trouble brewed ten times produces more than one distinct
   potion.
