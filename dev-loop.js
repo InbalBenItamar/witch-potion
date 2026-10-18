@@ -391,6 +391,7 @@ function getNextBacklogTask() {
     const isFullStack = stack === "full";
 
     return {
+      description: readTaskDescription(lines, i),
       line,
       title,
       slug: slugify(title),
@@ -401,6 +402,44 @@ function getNextBacklogTask() {
   }
 
   return null;
+}
+
+// The indented paragraphs under a backlog line: scope notes, acceptance criteria,
+// and decisions already made. Runs until the next task line or section heading.
+// Without this the planner sees only the title and re-opens settled questions.
+function readTaskDescription(lines, taskIndex) {
+  const body = [];
+  for (let j = taskIndex + 1; j < lines.length; j += 1) {
+    if (/^\s*-\s*\[( |x|X)\]/.test(lines[j]) || /^#/.test(lines[j])) break;
+    body.push(lines[j]);
+  }
+  const indents = body
+    .filter((l) => l.trim())
+    .map((l) => l.match(/^ */)[0].length);
+  const strip = indents.length ? Math.min(...indents) : 0;
+  return body
+    .map((l) => l.slice(strip))
+    .join("\n")
+    .trim();
+}
+
+// The docs every plan must be checked against. The product definition is
+// passed in full; these are read by the orchestrator itself, because they are
+// long enough that inlining all of them into every call would be wasteful.
+const PLANNING_DOCS = [
+  ".doc/architecture.md",
+  ".doc/ingredient.md",
+  ".doc/glossary.md",
+];
+
+function planningContext(task, prd) {
+  return `Task description from the backlog. Decisions recorded here are settled — build on them, do not reopen them:
+${task.description || "(none)"}
+
+Before planning, read ${PLANNING_DOCS.join(", ")}. The plan must agree with them.
+
+Product definition (.doc/product-definition.md, in full):
+${prd}`;
 }
 
 // Finds the task by its text, not by the line number it had when the run
@@ -515,8 +554,7 @@ ${
 Existing plans in .plan:
 ${prevList}
 
-PRD context (first 80 lines):
-${prd.split("\n").slice(0, 80).join("\n")}
+${planningContext(task, prd)}
 
 ${figmaPlanningGuidance}
 
@@ -586,8 +624,7 @@ ${figmaTaskLine}
 
 Plan path: ${planPath}
 
-PRD context (first 80 lines):
-${prd.split("\n").slice(0, 80).join("\n")}
+${planningContext(task, prd)}
 
 User feedback for this revision cycle:
 ${feedback}
