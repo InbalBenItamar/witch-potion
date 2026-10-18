@@ -2,6 +2,10 @@
   "$comment": "Guardrail wiring. Claude Code only reads hook and permission config from this file — a hook script in .claude/hooks/ that is not listed here never runs. See AGENTS.md.",
   "$comment2": "Approves the figma server from .mcp.json by name rather than using enableAllProjectMcpServers, so adding a server to .mcp.json is still a deliberate act. Without this, agents dev-loop.js spawns headlessly would see the server as 'pending approval' and silently run with no Figma tools.",
   "enabledMcpjsonServers": ["figma", "linear"],
+  "$comment3": "CONTEXT_WINDOW_TOKENS is read by .claude/hooks/context-watch.js. Match it to the window /context reports.",
+  "env": {
+    "CONTEXT_WINDOW_TOKENS": "1000000"
+  },
   "permissions": {
     "deny": [
       "Read(./.env)",
