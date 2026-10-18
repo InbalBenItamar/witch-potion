@@ -64,9 +64,9 @@ correct than two paths with different guarantees.
 ## How ingredients are chosen
 
 Both generators follow the same rule, and it is not "pick ingredients matching the
-trouble". Eleven of the seventeen feeling tags have fewer than five ingredients, and
-`jealous` and `stuck` have exactly one — so a matched-only potion is impossible for most
-troubles.
+trouble". Twelve of the eighteen feeling tags have fewer than five ingredients, and
+`jealous`, `stuck` and `excited` have exactly one — so a matched-only potion is impossible
+for most troubles.
 
 Instead: **at least one ingredient tagged for the trouble's feeling, the water, and the
 rest drawn from anywhere on the approved list** — the neutral pool in `.doc/ingredient.md`
@@ -106,6 +106,8 @@ is a constant here. Nothing needs indexing.
   filter on both paths, prompt as a versioned file.
 - 2026-10-18 — Composition rule: at least one matched ingredient with no upper limit,
   water in every potion. Added the feeling matcher and the filter's fifth check.
+- 2026-10-18 — `excited` added as an eighteenth feeling tag, for offline mode's feeling
+  chips. Defined `mode`: offline mode and witch mode.
 
 ## Update Triggers
 - Update this file when API routes, auth boundaries, org boundaries, or major component ownership changes.

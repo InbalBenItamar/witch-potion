@@ -241,6 +241,7 @@ const KEYWORD: ReadonlyArray<readonly [FeelingTag, readonly string[]]> = [
       "teased",
     ],
   ],
+  ["excited", ["excited", "can't wait", "cannot wait", "so excited"]],
   [
     "tired",
     [
