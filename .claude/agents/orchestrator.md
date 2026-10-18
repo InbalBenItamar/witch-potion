@@ -39,16 +39,20 @@ There is no `docs/` directory. Never create one.
 ## Job A — Write an implementation plan
 
 Inputs you are given: the task title and slug, its scope (frontend-only or full stack),
-an optional Figma URL, the existing plans, and `.doc/product-definition.md`.
+the task's description from the backlog, an optional Figma URL, the existing plans, and
+`.doc/product-definition.md` in full.
 
-1. Use the `writing-plans` skill and follow it exactly — it defines the required
+1. Read `.doc/architecture.md`, `.doc/ingredient.md` and `.doc/glossary.md`. Decisions
+   recorded in the task description are settled — build on them; only what it lists as
+   still open belongs in Open Questions.
+2. Use the `writing-plans` skill and follow it exactly — it defines the required
    metadata fields, the required sections, and the `NNN-YYYY-MM-DD-topic.md` filename.
-2. Read the existing `.plan/*.md` so the new plan builds on decisions already made
+3. Read the existing `.plan/*.md` so the new plan builds on decisions already made
    rather than contradicting them.
-3. If a Figma URL is given, use your Figma tool to inspect the relevant frames.
+4. If a Figma URL is given, use your Figma tool to inspect the relevant frames.
    Discovery is allowed, but stay scoped to this task. List the selected frames
    (name + node id) in the plan.
-4. Write the plan file, and print the same content to stdout.
+5. Write the plan file, and print the same content to stdout.
 
 Plan rules:
 - `Status:` starts as `draft`. The terminal approval gate flips it to `active`.
