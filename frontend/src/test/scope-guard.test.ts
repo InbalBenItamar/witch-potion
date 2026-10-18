@@ -5,7 +5,6 @@ import { describe, expect, it } from "vitest";
 const HERE = import.meta.dirname;
 const REPO_ROOT = path.resolve(HERE, "../../..");
 const SRC_ROOT = path.resolve(HERE, "..");
-const FIXTURE_FILE = path.resolve(SRC_ROOT, "fixture/potion.ts");
 const SELF = path.resolve(HERE, "scope-guard.test.ts");
 
 function walk(dir: string): string[] {
@@ -51,15 +50,16 @@ describe("frontend holds no ingredient logic", () => {
     expect(ingredientNames.length).toBeGreaterThanOrEqual(40);
   });
 
-  it("contains no approved ingredient name outside the fixture, in shipped code", () => {
-    // Test files may build a synthetic potion with realistic ingredient
-    // strings to assert rendering — that is not the frontend "knowing" the
-    // approved list, since nothing compares those strings against the doc.
-    // The guard is about what ships in the bundle, not what a test asserts.
+  it("contains no approved ingredient name anywhere in shipped code", () => {
+    // The fixture is gone: no shipped file under frontend/src may hold an
+    // approved ingredient name. Test files may still build a synthetic potion
+    // with realistic ingredient strings to assert rendering — that is not the
+    // frontend "knowing" the approved list, since nothing compares those
+    // strings against the doc. The guard is about what ships in the bundle.
     const offenders: string[] = [];
 
     for (const file of walk(SRC_ROOT)) {
-      if (file === FIXTURE_FILE || file === SELF) continue;
+      if (file === SELF) continue;
       if (file.endsWith(".test.ts") || file.endsWith(".test.tsx")) continue;
       const contents = fs.readFileSync(file, "utf-8");
       for (const name of ingredientNames) {

@@ -3,11 +3,52 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { CHIP } from "./data/chip";
-import { fixturePotion } from "./fixture/potion";
+import type { Potion } from "./type/potion";
 
 vi.mock("./lib/brew", () => ({
   brewPotion: vi.fn(),
 }));
+
+vi.mock("sonner", () => ({
+  toast: { error: vi.fn() },
+}));
+
+// A synthetic potion for the tests — test files may carry ingredient strings
+// (the scope guard exempts them), so the deleted fixture lives here now.
+const potion: Potion = {
+  name: "The Quiet Heart Potion",
+  ingredient: [
+    "half a cup of water",
+    "a spoonful of flour",
+    "three pinches of salt",
+    "a dried pasta star",
+    "a spoonful of dry rice",
+    "a length of ribbon",
+  ],
+  step: [
+    {
+      text: "Tip in the water and stir it three times.",
+      ingredient: ["half a cup of water"],
+      verb: "tip in",
+    },
+    {
+      text: "Sprinkle in the flour and the salt together.",
+      ingredient: ["a spoonful of flour", "three pinches of salt"],
+      verb: "sprinkle",
+    },
+    {
+      text: "Drop in the pasta star and whisper to it.",
+      ingredient: ["a dried pasta star"],
+      verb: "drop in",
+    },
+    {
+      text: "Scatter the rice, then place the ribbon on top.",
+      ingredient: ["a spoonful of dry rice", "a length of ribbon"],
+      verb: "scatter",
+    },
+  ],
+  closingLine: "Keep it warm and safe until morning.",
+};
 
 afterEach(() => {
   vi.resetAllMocks();
@@ -49,7 +90,7 @@ describe("App", () => {
 
   it("disables Brew while brewing and shows the potion once it resolves", async () => {
     const { brewPotion } = await import("./lib/brew");
-    let resolveBrew: (potion: typeof fixturePotion) => void = () => {};
+    let resolveBrew: (potion: Potion) => void = () => {};
     vi.mocked(brewPotion).mockReturnValue(
       new Promise((resolve) => {
         resolveBrew = resolve;
@@ -67,17 +108,43 @@ describe("App", () => {
 
     expect(screen.getByRole("button", { name: /brewing/i })).toBeDisabled();
 
-    resolveBrew(fixturePotion);
+    resolveBrew(potion);
 
-    expect(await screen.findByText(fixturePotion.name)).toBeInTheDocument();
+    expect(await screen.findByText(potion.name)).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /^brew$/i }),
     ).not.toBeInTheDocument();
   });
 
+  it("surfaces a toast and returns to the form with Brew enabled when a brew fails", async () => {
+    const { brewPotion } = await import("./lib/brew");
+    const { toast } = await import("sonner");
+    vi.mocked(brewPotion).mockRejectedValue(new Error("network down"));
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(
+      screen.getByLabelText(/what is bothering you/i),
+      "i miss someone",
+    );
+    await user.click(screen.getByRole("button", { name: /^brew$/i }));
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(toast.error).mock.calls[0][0]).toMatch(/witch/i);
+
+    // Back in front of an enabled Brew, trouble intact, no potion shown.
+    const brewButton = screen.getByRole("button", { name: /^brew$/i });
+    expect(brewButton).toBeEnabled();
+    expect(screen.getByLabelText(/what is bothering you/i)).toHaveValue(
+      "i miss someone",
+    );
+    expect(screen.queryByText(potion.name)).not.toBeInTheDocument();
+  });
+
   it("moves focus to the potion name once it is shown", async () => {
     const { brewPotion } = await import("./lib/brew");
-    vi.mocked(brewPotion).mockResolvedValue(fixturePotion);
+    vi.mocked(brewPotion).mockResolvedValue(potion);
 
     const user = userEvent.setup();
     render(<App />);
@@ -90,14 +157,14 @@ describe("App", () => {
 
     const heading = await screen.findByRole("heading", {
       level: 2,
-      name: fixturePotion.name,
+      name: potion.name,
     });
     await waitFor(() => expect(heading).toHaveFocus());
   });
 
   it("returns to the form with the trouble intact when Back is clicked", async () => {
     const { brewPotion } = await import("./lib/brew");
-    vi.mocked(brewPotion).mockResolvedValue(fixturePotion);
+    vi.mocked(brewPotion).mockResolvedValue(potion);
 
     const user = userEvent.setup();
     render(<App />);
@@ -107,7 +174,7 @@ describe("App", () => {
       "i miss someone",
     );
     await user.click(screen.getByRole("button", { name: /^brew$/i }));
-    await screen.findByText(fixturePotion.name);
+    await screen.findByText(potion.name);
 
     await user.click(screen.getByRole("button", { name: /back/i }));
 
@@ -118,7 +185,7 @@ describe("App", () => {
 
   it("returns to the form when Escape is pressed while presenting", async () => {
     const { brewPotion } = await import("./lib/brew");
-    vi.mocked(brewPotion).mockResolvedValue(fixturePotion);
+    vi.mocked(brewPotion).mockResolvedValue(potion);
 
     const user = userEvent.setup();
     render(<App />);
@@ -128,11 +195,11 @@ describe("App", () => {
       "i miss someone",
     );
     await user.click(screen.getByRole("button", { name: /^brew$/i }));
-    await screen.findByText(fixturePotion.name);
+    await screen.findByText(potion.name);
 
     await user.keyboard("{Escape}");
 
     expect(screen.getByLabelText(/what is bothering you/i)).toBeVisible();
-    expect(screen.queryByText(fixturePotion.name)).not.toBeInTheDocument();
+    expect(screen.queryByText(potion.name)).not.toBeInTheDocument();
   });
 });

@@ -3,6 +3,12 @@ import { expect, test } from "@playwright/test";
 test("a child can type a trouble, brew, and see the potion", async ({
   page,
 }) => {
+  // The local backend answers in milliseconds — faster than Playwright can
+  // observe the brewing state. Hold the real response briefly so it is seen.
+  await page.route("**/api/potion", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await route.continue();
+  });
   await page.goto("/");
 
   await page.getByLabel(/what is bothering you/i).fill("i miss someone");
