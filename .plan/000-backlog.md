@@ -48,6 +48,39 @@ Current queue:
     text }`. The cascade is then a list check rather than substring matching on prose,
     and AC5's verb check reads the field instead of parsing a sentence.
 
+- [ ] offline mode: pick a feeling | stack:full
+
+  With no key, the child taps how they feel instead of typing what happened. The
+  keyword feeling matcher cannot read open-ended text: on 2026-10-18 a fresh set of 15
+  troubles phrased the way children talk ("my brother keeps hitting me", "I have to
+  sing in assembly") matched 20%, before and after tuning — misses fall back to a
+  `hopeful` potion that is safe but not about the trouble. Letting the child choose
+  the feeling makes the match exact by construction. It also suits the youngest end of
+  the audience — tapping a face is easier than writing a sentence.
+
+  Decided 2026-10-18 — the plan builds on these, it does not reopen them:
+
+  - **Ten feeling chips, each with a face.** Seventeen tags is too many for a child to
+    scan; ten covers the common troubles. Proposed set: `sad`, `angry`, `scared`,
+    `worried`, `lonely`, `left-out`, `missing-someone`, `frustrated`, `jealous`,
+    `bored`. Confirm or swap at the plan gate.
+  - **The text box is shown greyed out, with a short child-facing explanation** of why
+    the witch cannot read it right now — not hidden, so the feature is visible and the
+    layout is the same in both modes.
+  - **Not random.** A random feeling can be cruel — "my dog died" answered with the
+    potion for anger. A chip pick is always the child's own feeling.
+  - **The browser learns the mode from the backend**, which alone knows whether a key
+    is set — for example `GET /api/mode` → `offline` | `witch`. Only the mode crosses
+    to the browser; the key never does.
+  - **The keyword matcher stays** for one case: a witch-mode brew whose Claude call
+    fails falls back to the offline potion, which still needs a feeling from text.
+
+  Open for the plan: the explanation's wording; how a picked feeling travels in the
+  request (a `tag` beside or instead of `trouble`); the empty-input rule (AC6) in chip
+  mode; and whether witch mode also shows the feeling chips. Changes AC6 and the chip
+  definition in `.doc/glossary.md` (chips stop being example troubles in this mode), so
+  `.doc/product-definition.md` and the glossary are updated by a human before the run.
+
 - [ ] let the witch write it | stack:full
 
   Adds the `witch generator`: the versioned prompt file, the Claude call, reply parsing,
@@ -55,6 +88,10 @@ Current queue:
   failure on this path — timeout, malformed reply, schema mismatch, too few surviving
   ingredients — degrades to the offline potion rather than surfacing an error.
   Acceptance criteria AC11, plus AC1 to AC5 and AC13 re-proven on the Claude path.
+
+  With a key, Claude also decides the feeling from the child's text — it reads
+  "my dog died" as sad without a keyword list. The keyword matcher remains only as the
+  offline fallback (see the task above).
 
   Last rather than first because it is the only slice that needs a key, costs money per
   run, and cannot be tested deterministically. By the time it lands, the filter it feeds
