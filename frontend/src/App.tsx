@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { BrewButton } from "./component/BrewButton";
 import { ChipRow } from "./component/ChipRow";
 import { PotionCard } from "./component/PotionCard";
@@ -32,9 +33,16 @@ export function App() {
     }
     setError(null);
     setBrewState("brewing");
-    const result = await brewPotion(trimmed);
-    setPotion(result);
-    setBrewState("presenting");
+    try {
+      const result = await brewPotion(trimmed);
+      setPotion(result);
+      setBrewState("presenting");
+    } catch {
+      // Never fail silently (AC12): tell the child the witch is busy and
+      // put them back in front of an enabled Brew button to try again.
+      toast.error("The witch could not brew that. Try again in a moment.");
+      setBrewState("waiting");
+    }
   };
 
   const handleBack = () => {

@@ -26,6 +26,9 @@ Each ingredient answers one or more feelings. The generators match a trouble to 
 `jealous` · `bored` · `restless` · `embarrassed` · `tired` · `missing-someone` ·
 `nervous` · `disappointed` · `stuck` · `hopeful`
 
+**Default tag:** `hopeful`. When the feeling matcher cannot find a feeling in the
+trouble, it answers with this one, so every trouble still gets a potion.
+
 ## Kitchen cupboard
 
 | Ingredient | Answers | Why the witch reaches for it |
