@@ -17,3 +17,8 @@ yarn-error.log*
 
 # macOS
 .DS_Store
+
+# Dev loop output — regenerated every run, never source of truth. The README
+# that explains the directory stays tracked. See .orchestrate/README.md.
+.orchestrate/*
+!.orchestrate/README.md
