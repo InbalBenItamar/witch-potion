@@ -34,6 +34,13 @@ const CLAUDE_PERMISSION_MODE =
   "bypassPermissions";
 const CLAUDE_ALLOWED_TOOLS =
   process.env.CLAUDE_ALLOWED_TOOLS || getArg("--claude-allowed-tools");
+// One model for every Claude call the loop makes. trace-agent.js reads the
+// same variable, so a single .env line switches both.
+const CLAUDE_MODEL =
+  process.env.CLAUDE_MODEL || getArg("--model") || "claude-opus-4-8";
+// Every task branch is cut from here, never from whatever happens to be
+// checked out — otherwise a run started on a feature branch inherits its work.
+const BASE_BRANCH = process.env.BASE_BRANCH || getArg("--base") || "main";
 
 const PLAN_DIR = ".plan";
 const BACKLOG_FILE = `${PLAN_DIR}/000-backlog.md`;
@@ -384,7 +391,6 @@ function getNextBacklogTask() {
     const isFullStack = stack === "full";
 
     return {
-      lineIndex: i,
       line,
       title,
       slug: slugify(title),
@@ -397,12 +403,21 @@ function getNextBacklogTask() {
   return null;
 }
 
+// Finds the task by its text, not by the line number it had when the run
+// started. A run can wait at an approval prompt for hours, and the backlog can
+// change underneath it — edited by hand, or by the orchestrator, which runs
+// without AGENT_ROLE — so the stored index can point at a different task.
 function markBacklogTaskDone(task) {
   const text = readFileSync(BACKLOG_FILE, "utf-8");
   const lines = text.split("\n");
-  const current = lines[task.lineIndex];
-  if (!current) return;
-  lines[task.lineIndex] = current.replace("[ ]", "[x]");
+  const index = lines.findIndex((l) => l.trim() === task.line);
+  if (index === -1) {
+    warn(
+      `Could not find '${task.line}' in ${BACKLOG_FILE} — it was edited during the run. Tick it by hand.`,
+    );
+    return;
+  }
+  lines[index] = lines[index].replace("[ ]", "[x]");
   writeFileSync(BACKLOG_FILE, lines.join("\n"), "utf-8");
 }
 
@@ -470,7 +485,7 @@ async function askClaudeForPlan({
 
   const args = [
     "--model",
-    "claude-opus-4-8",
+    CLAUDE_MODEL,
     "--permission-mode",
     CLAUDE_PERMISSION_MODE,
     "--add-dir",
@@ -547,7 +562,7 @@ async function askClaudeToRevisePlan({
     : "- figma: (none provided)";
   const args = [
     "--model",
-    "claude-opus-4-8",
+    CLAUDE_MODEL,
     "--permission-mode",
     CLAUDE_PERMISSION_MODE,
     "--add-dir",
@@ -555,6 +570,8 @@ async function askClaudeToRevisePlan({
     "--append-system-prompt-file",
     AGENT_PROMPT.orchestrator,
     "--print",
+    "--output-format",
+    "json",
   ];
   if (CLAUDE_ALLOWED_TOOLS) args.push("--allowedTools", CLAUDE_ALLOWED_TOOLS);
 
@@ -586,9 +603,40 @@ Hard requirements:
 - Keep Status as draft until explicit APPROVED in terminal
 - Resolve or update Open Questions based on feedback where possible`;
 
-  const stdout = await spawnClaude(args, input);
-  if (!stdout) return null;
-  return stdout.trim() || null;
+  // A failed revision is recoverable — the review loop warns and asks again —
+  // so it is caught here instead of ending the run.
+  let rawStdout;
+  try {
+    rawStdout = await spawnClaude(args, input);
+  } catch (err) {
+    warn(`Plan revision failed: ${err.message}`);
+    return null;
+  }
+  if (!rawStdout) return null;
+  const stdout = recordCost(
+    "orchestrator",
+    "Orchestrator (revision)",
+    rawStdout,
+  );
+  logLastCost("Orchestrator (revision)");
+
+  // The orchestrator has file tools and the writing-plans skill tells it to
+  // write the plan file, so it often edits the file directly and then prints a
+  // one-line summary. If the file changed, the file is the revision — the
+  // summary must not overwrite it. Same rule askClaudeForPlan applies.
+  const onDisk = existsSync(planPath) ? readFileSync(planPath, "utf-8") : "";
+  if (onDisk !== currentPlan && onDisk.trim().length > 200) return onDisk;
+
+  // File untouched, so stdout should be the plan. A plan carries a Status line
+  // (writing-plans metadata); anything without one is chatter, not a plan.
+  const printed = stdout.trim();
+  if (!/^Status:/m.test(printed)) {
+    warn(
+      "Revision neither updated the plan file nor printed a plan — keeping the current plan.",
+    );
+    return null;
+  }
+  return printed;
 }
 
 async function reviewPlanUntilApproved({ task, prd, figmaUrl, planPath }) {
@@ -644,7 +692,7 @@ async function askClaudeToCreateTickets({ teamId, task, planPath }) {
   const plan = existsSync(planPath) ? readFileSync(planPath, "utf-8") : "";
   const args = [
     "--model",
-    "claude-opus-4-8",
+    CLAUDE_MODEL,
     "--permission-mode",
     CLAUDE_PERMISSION_MODE,
     "--add-dir",
@@ -682,7 +730,14 @@ TICKETS_JSON
 ${shape}
 END_TICKETS_JSON`;
 
-  const stdout = await spawnClaude(args, input);
+  // Caught: the caller already falls back to the direct Linear API on null.
+  let stdout;
+  try {
+    stdout = await spawnClaude(args, input);
+  } catch (err) {
+    warn(`Ticket creation via Claude failed: ${err.message}`);
+    return null;
+  }
   if (!stdout) return null;
   return parseTicketsFromOutput(stdout, { requireBackend: task.isFullStack });
 }
@@ -891,7 +946,7 @@ async function runAgent({
 }) {
   const args = [
     "--model",
-    "claude-opus-4-8",
+    CLAUDE_MODEL,
     "--permission-mode",
     CLAUDE_PERMISSION_MODE,
     "--add-dir",
@@ -913,14 +968,24 @@ async function runAgent({
   // bypassPermissions for this demo, so hooks are the only real guardrail left.
   // The name must stay in step with that hook and with AGENTS.md; renaming it on
   // one side only makes the hook fail OPEN, silently.
-  const rawStdout = await spawnClaude(
-    args,
-    input,
-    role ? { AGENT_ROLE: role } : {},
-  );
+  let rawStdout;
+  try {
+    rawStdout = await spawnClaude(
+      args,
+      input,
+      role ? { AGENT_ROLE: role } : {},
+    );
+  } catch (err) {
+    // Stop the whole run. Carrying on would hand the next agent, and then the
+    // approval gate, work that was never done.
+    throw new Error(
+      `${label} failed (${err.message}). Stopping the loop — nothing was simulated. ` +
+        `Check the agent's output above, fix the cause, and re-run.`,
+    );
+  }
 
   if (rawStdout === null) {
-    warn(`${label}: Claude not available or failed — simulating output.`);
+    warn(`${label}: claude CLI not installed — simulating output.`);
     simulateAgent(label, outputFile, doneMarker);
     return;
   }
@@ -933,7 +998,11 @@ async function runAgent({
   if (stdout.includes(doneMarker) || doneRegex.test(stdout)) {
     log(`${label}: STATUS: DONE ✓`);
   } else {
-    warn(`${label} finished but did not include '${doneMarker}' marker.`);
+    // The agent exited cleanly but did not claim to be finished (ran out of
+    // turns, gave up, asked a question). Same rule as a crash: stop.
+    throw new Error(
+      `${label} finished without '${doneMarker}'. Stopping the loop — read ${outputFile} for what it reported.`,
+    );
   }
 }
 
@@ -955,7 +1024,7 @@ function spawnClaude(args, stdinText, extraEnv = {}) {
   // mid-demo) — the caller prints a clean summary once recordCost() parses it.
   const quiet = args.includes("--output-format");
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     let child;
     if (process.platform === "win32") {
       const command = ["claude", ...args.map(quoteArgForCmd)].join(" ");
@@ -982,8 +1051,17 @@ function spawnClaude(args, stdinText, extraEnv = {}) {
     child.stdin.write(stdinText);
     child.stdin.end();
 
-    child.on("error", () => resolve(null));
-    child.on("close", (code) => resolve(code === 0 ? stdout : null));
+    // null means only "the CLI is not installed" (checked above) — the demo's
+    // simulation path. A CLI that IS installed and then fails is a real failure
+    // and rejects, so a crashed agent can never be mistaken for a finished one.
+    child.on("error", (err) =>
+      reject(new Error(`could not start claude: ${err.message}`)),
+    );
+    child.on("close", (code) =>
+      code === 0
+        ? resolve(stdout)
+        : reject(new Error(`claude exited with code ${code}`)),
+    );
   });
 }
 
@@ -1041,24 +1119,49 @@ Deliver ${task.title} in the existing product using incremental FE, BE, and QA u
 //
 // Create-then-fall-back, not check-then-create: `git switch -c` decides
 // "does this branch exist" atomically, so a re-run against a leftover branch from
-// an earlier demo cannot land between the check and the create. Branch bookkeeping
-// also never aborts the run — a live demo continuing on the current branch beats a
-// stack trace on the projector.
+// an earlier run cannot land between the check and the create.
+//
+// Every failure here stops the run. Agents write wherever HEAD is, so continuing
+// after a failed switch means writing on whatever was checked out — main
+// included, which .claude/rules/git-workflow.md forbids.
 function createGitBranch(branch) {
-  try {
-    execSync(`git switch -c ${branch}`, { stdio: "ignore" });
-    log(`Created git branch: ${branch}`);
-    return;
-  } catch {
-    // Branch already exists (or the switch was refused) — fall through.
+  // Uncommitted changes ride along on `git switch`, so they would land in the
+  // task branch mixed with the agents' work. That includes the previous task
+  // of this same run: the loop never commits, so task 2 stops here until
+  // task 1 has been reviewed and committed.
+  const dirty = git("status --porcelain");
+  if (dirty) {
+    throw new Error(
+      `Working tree has uncommitted changes — commit or stash them before starting '${branch}':\n${dirty}`,
+    );
   }
 
   try {
-    execSync(`git switch ${branch}`, { stdio: "inherit" });
-    log(`Git branch '${branch}' already exists — checked it out.`);
+    execSync(`git switch -c ${branch} ${BASE_BRANCH}`, { stdio: "ignore" });
+    log(`Created git branch: ${branch} (from ${BASE_BRANCH})`);
   } catch {
-    warn(`Could not switch to '${branch}' — continuing on the current branch.`);
+    // Branch already exists — fall through and check it out.
+    try {
+      execSync(`git switch ${branch}`, { stdio: "inherit" });
+      log(`Git branch '${branch}' already exists — checked it out.`);
+    } catch {
+      throw new Error(
+        `Could not create or switch to '${branch}'. Stopping rather than letting agents write on the current branch.`,
+      );
+    }
   }
+
+  // Belt and braces: whatever git reported, refuse to run anywhere else.
+  const current = git("branch --show-current");
+  if (current !== branch) {
+    throw new Error(
+      `Expected to be on '${branch}' but HEAD is on '${current || "a detached commit"}'. Stopping.`,
+    );
+  }
+}
+
+function git(command) {
+  return execSync(`git ${command}`, { encoding: "utf-8" }).trimEnd();
 }
 
 function slugify(value) {

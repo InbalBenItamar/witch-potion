@@ -1,5 +1,18 @@
 #!/usr/bin/env node
 /**
+ * PARKED — kept for a future workshop, not used in this project.
+ *
+ * --force deletes every unmerged local branch, which on a real project is real
+ * work. The `demo:reset` npm script is removed and the guard below refuses to
+ * run. To bring it back: delete the guard and re-add
+ * `"demo:reset": "node demo-reset.mjs"` to package.json.
+ */
+console.error(
+  "demo-reset.mjs is parked — see the comment at the top of the file.",
+);
+process.exit(1);
+
+/**
  * Demo reset — puts the repo back to the state a dev-loop demo expects.
  *
  *   npm run demo:reset            # do it

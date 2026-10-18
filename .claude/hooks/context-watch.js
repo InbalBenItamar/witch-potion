@@ -15,7 +15,12 @@
 
 import fs from 'node:fs'
 
-const BUDGET = 600_000        // model context window
+// The model's context window, in tokens. Not derivable from the transcript —
+// it depends on the model and plan — so it is a setting: CONTEXT_WINDOW_TOKENS
+// in the "env" block of .claude/settings.json. Check the real value with
+// /context. Too low and the hint nags early; too high and auto-compact gets
+// there first, so the hint never fires.
+const BUDGET = Number(process.env.CONTEXT_WINDOW_TOKENS) || 1_000_000
 const WARN_AT = 0.80          // inject a hint once 80% full
 const TAIL_BYTES = 512 * 1024 // transcripts reach tens of MB; only the tail is scanned
 
