@@ -90,9 +90,11 @@ Each criterion must be provable by a test. The QA agent marks these PASS/FAIL pe
 - AC7 — Potion shape: name, five to seven ingredients as generated, at least three
   ordered steps, and a closing line. Validated against a schema on both paths.
 - AC7a — Every potion is about the trouble: at least one ingredient carries a feeling tag
-  matching the trouble, and no more than three do. The remainder come from the neutral
-  pool in `.doc/ingredient.md`. A potion with zero matched ingredients is not a potion for
-  that trouble and is rejected.
+  matching the trouble. There is no upper limit — the rest may be any approved
+  ingredient, matched or not. A potion with zero matched ingredients is not a potion for
+  that trouble and is rejected. Every trouble resolves to a feeling tag, including one
+  that names no feeling at all, so a potion can always meet this.
+- AC7b — Every potion has a liquid: half a cup of water is in every served potion.
 - AC8 — Variation: the same trouble brewed ten times produces more than one distinct
   potion.
 - AC9 — Repeatable tests: given a fixed seed, the `offline generator` returns an

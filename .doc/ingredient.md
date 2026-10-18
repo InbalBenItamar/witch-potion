@@ -24,13 +24,13 @@ Each ingredient answers one or more feelings. The generators match a trouble to 
 
 `scared` · `worried` · `lonely` · `left-out` · `sad` · `angry` · `frustrated` ·
 `jealous` · `bored` · `restless` · `embarrassed` · `tired` · `missing-someone` ·
-`nervous` · `disappointed` · `stuck`
+`nervous` · `disappointed` · `stuck` · `hopeful`
 
 ## Kitchen cupboard
 
 | Ingredient | Answers | Why the witch reaches for it |
 |---|---|---|
-| half a cup of water | *base* | Every potion starts here |
+| half a cup of water | *in every potion* | Every potion starts here. Not a feeling tag — in the data it is a flag of its own |
 | a spoonful of flour | worried, scared | Soft, plain, settles everything down |
 | three pinches of salt | scared, worried | The oldest protection there is |
 | a spoonful of sugar | sad, disappointed | For when something needs sweetening |
@@ -87,8 +87,10 @@ Each ingredient answers one or more feelings. The generators match a trouble to 
 
 Most feelings have only three or four ingredients tagged for them, and two — `jealous`
 and `stuck` — have exactly one. So a potion is **not** built only from ingredients
-matching the trouble. It takes one to three matched ingredients and fills the rest from
-this neutral pool, which may appear in any potion regardless of the trouble.
+matching the trouble. It takes at least one matched ingredient, the water, and fills the
+rest from this neutral pool, which may appear in any potion regardless of the trouble.
+Several entries here carry feeling tags of their own; a potion that picks up extra
+matches this way is fine — there is no upper limit.
 
 This is also how a recipe actually reads: a couple of things chosen *for your feeling*,
 and the rest is what makes it a potion.

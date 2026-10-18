@@ -20,9 +20,10 @@
 | Browser app | `frontend/` | Text box, chips, Brew button, potion display. Holds no key and no ingredient logic |
 | Brew route | `backend/` | `POST /api/potion`. Validates the trouble, picks a generator, runs the filter, returns the potion |
 | Generator interface | `backend/` | One shape both generators satisfy: `trouble` in, candidate `potion` out |
-| Offline generator | `backend/` | Matches the trouble against feeling tags, picks one to three matched ingredients, fills the rest from the neutral pool, and assembles a potion. Takes an injected random number generator so tests can seed it |
+| Feeling matcher | `backend/` | Turns the trouble's free text into one feeling tag. Always returns a tag — a trouble that matches nothing gets the default tag set in the ingredient data — so every brew has a feeling to answer |
+| Offline generator | `backend/` | Takes the feeling tag from the feeling matcher, picks at least one matched ingredient, always adds the water, fills the rest from the approved list, and assembles a potion. Takes an injected random number generator so tests can seed it |
 | Witch generator | `backend/` | Sends the prompt and the approved ingredient list to Claude, parses the reply |
-| Filter | `backend/` | Removes unapproved ingredients, cascades removals into the steps, enforces the floor of four, rejects unapproved step verbs, and rejects text over the readability limits |
+| Filter | `backend/` | Removes unapproved ingredients, cascades removals into the steps, enforces the floor of four, rejects unapproved step verbs, rejects text over the readability limits, and rejects a potion with no matched ingredient or no water |
 | Ingredient data | `backend/` | The machine-readable form of `.doc/ingredient.md`, asserted to match it by a test |
 | Prompt | `backend/` | A versioned file, passed into the witch generator as input, never inlined |
 
@@ -30,9 +31,10 @@
 1. The child types a `trouble`, or clicks a `chip` that fills the box, and presses Brew.
 2. The browser posts the trouble to `POST /api/potion`.
 3. The route rejects an empty or whitespace-only trouble before anything else runs.
-4. Generator selection: if `ANTHROPIC_API_KEY` is set, the `witch generator` runs;
+4. The feeling matcher turns the trouble into a feeling tag.
+5. Generator selection: if `ANTHROPIC_API_KEY` is set, the `witch generator` runs;
    otherwise the `offline generator` runs.
-5. The candidate potion goes through the filter, which applies four checks in order:
+6. The candidate potion goes through the filter, which applies five checks in order:
    1. **Ingredients** — anything not in `.doc/ingredient.md` is dropped, and any step
       that referred only to a dropped ingredient is dropped with it.
    2. **Floor of four** — fewer than four approved ingredients surviving discards the
@@ -42,12 +44,15 @@
       one: "heat the mixture" and "cut the ribbon" are exactly what it exists to stop.
    4. **Readability** — text over the limits in `product-definition.md` discards the
       whole candidate.
-6. A discarded candidate falls through to the `offline generator`. That result is passed
+   5. **Composition** — no ingredient matching the feeling tag (AC7a), or no water
+      (AC7b), discards the whole candidate.
+7. A discarded candidate falls through to the `offline generator`. That result is passed
    through the same filter — it can only pass, because it was built from the approved
-   list and the approved verbs in the first place.
-7. The route returns the potion, plus which generator produced it.
+   list and the approved verbs in the first place, always contains the water, and always
+   has a feeling tag to match because the feeling matcher never returns nothing.
+8. The route returns the potion, plus which generator produced it.
 
-Checks 3 and 4 discard rather than repair. Rewriting a child's recipe to make it legal
+Checks 3, 4 and 5 discard rather than repair. Rewriting a child's recipe to make it legal
 would produce something neither generator intended; falling back gives a potion that is
 whole and known-good.
 
@@ -63,9 +68,11 @@ trouble". Eleven of the seventeen feeling tags have fewer than five ingredients,
 `jealous` and `stuck` have exactly one — so a matched-only potion is impossible for most
 troubles.
 
-Instead: **one to three ingredients tagged for the trouble's feeling, and the rest drawn
-from the neutral pool** in `.doc/ingredient.md`, to a total of five to seven. At least one
-matched ingredient is required; a potion with none is not about the trouble at all.
+Instead: **at least one ingredient tagged for the trouble's feeling, the water, and the
+rest drawn from anywhere on the approved list** — the neutral pool in `.doc/ingredient.md`
+is the natural filler — to a total of five to seven. There is no upper limit on matched
+ingredients: a worried potion that happens to pick up flour and salt, both tagged
+`worried`, is fine. A potion with no matched ingredient is not about the trouble at all.
 
 Selection is a single pass over the 42 ingredients per brew — O(n) in the list size, which
 is a constant here. Nothing needs indexing.
@@ -97,6 +104,8 @@ is a constant here. Nothing needs indexing.
 ## Change Log
 - 2026-08-25 — Initial architecture. Two services, two generators behind one interface,
   filter on both paths, prompt as a versioned file.
+- 2026-10-18 — Composition rule: at least one matched ingredient with no upper limit,
+  water in every potion. Added the feeling matcher and the filter's fifth check.
 
 ## Update Triggers
 - Update this file when API routes, auth boundaries, org boundaries, or major component ownership changes.
