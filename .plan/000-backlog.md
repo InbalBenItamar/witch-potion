@@ -61,9 +61,9 @@ Current queue:
   Decided 2026-10-18 — the plan builds on these, it does not reopen them:
 
   - **Ten feeling chips, each with a face.** Seventeen tags is too many for a child to
-    scan; ten covers the common troubles. Proposed set: `sad`, `angry`, `scared`,
-    `worried`, `lonely`, `left-out`, `missing-someone`, `frustrated`, `jealous`,
-    `bored`. Confirm or swap at the plan gate.
+    scan; ten covers the common troubles: `sad`, `angry`, `scared`, `worried`,
+    `lonely`, `left-out`, `excited`, `frustrated`, `jealous`, `bored`. `excited` was
+    added as an eighteenth tag for this, answered by the pom-pom.
   - **The text box is shown greyed out, with a short child-facing explanation** of why
     the witch cannot read it right now — not hidden, so the feature is visible and the
     layout is the same in both modes.
@@ -75,11 +75,13 @@ Current queue:
   - **The keyword matcher stays** for one case: a witch-mode brew whose Claude call
     fails falls back to the offline potion, which still needs a feeling from text.
 
+  AC6, AC7a, the glossary's `chip` and the new `mode` term were updated by a human
+  before the run (2026-10-18) — the plan reads them, agents do not edit `.doc/`.
+  Acceptance criteria AC6 and AC7a in offline mode; the rest re-proven unchanged.
+
   Open for the plan: the explanation's wording; how a picked feeling travels in the
-  request (a `tag` beside or instead of `trouble`); the empty-input rule (AC6) in chip
-  mode; and whether witch mode also shows the feeling chips. Changes AC6 and the chip
-  definition in `.doc/glossary.md` (chips stop being example troubles in this mode), so
-  `.doc/product-definition.md` and the glossary are updated by a human before the run.
+  request (a `tag` beside or instead of `trouble`); the face for each chip; and whether
+  witch mode also shows the feeling chips.
 
 - [ ] let the witch write it | stack:full
 
@@ -128,8 +130,8 @@ Current queue:
   brew, so this is the task that introduces state — version one deliberately
   stores nothing. Decide where it lives before building.
 
-  Offer the starter kit from `.doc/ingredient.md` as a one-tap preset — sixteen
-  ingredients that between them cover all seventeen feeling tags, so ticking it
+  Offer the starter kit from `.doc/ingredient.md` as a one-tap preset — seventeen
+  ingredients that between them cover all eighteen feeling tags, so ticking it
   guarantees the witch can brew for anything. A flat minimum of ten ticks is the
   floor beneath it, but ten arbitrary ticks do not guarantee coverage: check that
   what is ticked can still produce a potion for every feeling, and say which

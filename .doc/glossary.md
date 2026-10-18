@@ -44,7 +44,10 @@
 	- Canonical meaning: the versioned file of instructions sent to Claude.
 	- Use: `prompt`, and it is a file, never a string literal.
 - `chip`
-	- Canonical meaning: one clickable suggested trouble shown beside the text box.
+	- Canonical meaning: one clickable choice shown beside the text box. In witch mode a
+	  chip is a suggested trouble and fills the text box. In offline mode it is a
+	  `feeling chip`: one of ten feeling tags, shown with a face, and picking it is the
+	  input.
 	- Use: `chip`, never `pill`, `suggestion`, or `example`. Never `tag` either — that
 	  word is taken, see `feeling tag` below.
 - `feeling tag`
@@ -53,6 +56,11 @@
 	  matches a trouble against these to choose ingredients.
 	- Use: `feeling tag` in prose, `tag` in code where the context is an ingredient.
 	  Never `mood`, `emotion`, `category`, or `label`.
+- `mode`
+	- Canonical meaning: whether the witch can read text. `witch mode` when the backend
+	  has an API key, `offline mode` when it has none. Only the backend knows; it tells
+	  the browser the mode, never the key.
+	- Use: `offline mode` and `witch mode`, never `demo`, `lite`, `fallback`, or `no-key`.
 - `feeling matcher`
 	- Canonical meaning: the component that turns a trouble's free text into exactly one
 	  feeling tag. It always returns one — a trouble that names no feeling gets the
